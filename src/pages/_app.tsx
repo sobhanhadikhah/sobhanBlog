@@ -5,6 +5,7 @@ import { type AppType } from "next/app";
 import { api } from "~/utils/api";
 
 import "~/styles/globals.css";
+import Navbar from "~/components/layout/navbar";
 
 const MyApp: AppType<{ session: Session | null }> = ({
   Component,
@@ -12,7 +13,10 @@ const MyApp: AppType<{ session: Session | null }> = ({
 }) => {
   return (
     <SessionProvider session={session}>
+      <main className="max-w-[1240px] mx-auto" >
+      <Navbar/>
       <Component {...pageProps} />
+      </main>
     </SessionProvider>
   );
 };

@@ -5,13 +5,19 @@ generator client {
     provider = "prisma-client-js"
 }
 
+
 datasource db {
-    provider = "sqlite"
+    provider = "postgresql"
     // NOTE: When using mysql or sqlserver, uncomment the @db.Text annotations in model Account below
     // Further reading:
     // https://next-auth.js.org/adapters/prisma#create-the-prisma-schema
     // https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string
     url      = env("DATABASE_URL")
+}
+enum UserRole {
+  USER
+  ADMIN
+  MODERATOR
 }
 
 model Example {
@@ -58,6 +64,7 @@ model User {
     image         String?
     accounts      Account[]
     sessions      Session[]
+    role          UserRole @default(USER)
 }
 
 model VerificationToken {
@@ -66,4 +73,9 @@ model VerificationToken {
     expires    DateTime
 
     @@unique([identifier, token])
+}
+model Post {
+    id      String @id @default(cuid())
+    title   String
+    content String
 }
