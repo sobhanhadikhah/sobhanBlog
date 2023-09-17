@@ -1,5 +1,5 @@
 /* eslint-disable no-var */
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from '@prisma/client';
 
 declare global {
   var prisma: PrismaClient;
@@ -7,8 +7,8 @@ declare global {
 
 let prisma: PrismaClient;
 
-if (typeof window === "undefined") {
-  if (process.env.NODE_ENV === "production") {
+if (typeof window === 'undefined') {
+  if (process.env.NODE_ENV === 'production') {
     if (!global.prisma) {
       global.prisma = new PrismaClient();
     }

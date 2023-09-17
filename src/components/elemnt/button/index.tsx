@@ -1,10 +1,10 @@
-import { type NextPage } from 'next'
-import Link from 'next/link'
-import { type ComponentPropsWithRef, type ReactNode } from 'react'
+import { type NextPage } from 'next';
+import Link from 'next/link';
+import { type ComponentPropsWithRef, type ReactNode } from 'react';
 
-interface Props extends ComponentPropsWithRef<"button"> {
-  children: ReactNode,
-  to?: string
+interface Props extends ComponentPropsWithRef<'button'> {
+  children: ReactNode;
+  to?: string;
 }
 
 const Button: NextPage<Props> = ({ children, to, ...props }) => {
@@ -19,11 +19,11 @@ const Button: NextPage<Props> = ({ children, to, ...props }) => {
   }
   return (
     <>
-    <button {...props} className={`rounded-xl px-2 py-1 ${props.className}`}>
-      {children}
-    </button>
+      <button {...props} className={`rounded-xl px-2 py-1 ${props.className}`}>
+        {children}
+      </button>
     </>
   );
-}
+};
 
 export default Button;

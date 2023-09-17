@@ -1,11 +1,15 @@
-import { signIn, signOut, useSession } from "next-auth/react";
-import Image from "next/image";
-import Link from "next/link";
-import { useState, useRef } from "react";
-import { useOutsideClick } from "~/hook/useOutsideClick";
+import { signIn, signOut, useSession } from 'next-auth/react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useState, useRef } from 'react';
+import Loading from '~/components/elemnt/loading';
+import { useOutsideClick } from '~/hook/useOutsideClick';
+import { api } from '~/utils/api';
 
 function Navbar() {
   const { data: sessionData } = useSession();
+  const id = typeof sessionData?.user.id === 'string' ? sessionData.user.id : '';
+  const { data: dataUser, isLoading } = api.user.userInfo.useQuery({ id: id });
   const Profile = sessionData?.user.image;
   const [toggle, setToggle] = useState(false);
 
@@ -17,48 +21,49 @@ function Navbar() {
   });
 
   return (
-    <nav className="flex sticky top-0 flex-row justify-between items-center gap-3 p-5">
+    <nav className="sticky top-0  z-50 flex flex-row items-center justify-between gap-3 bg-neutral-900 p-5">
       <div>
-        <Link href={"/"}>iBlog</Link>
+        <Link href={'/'}>iBlog</Link>
       </div>
       <div>
         {sessionData ? (
           <>
             <Image
               onClick={() => setToggle((prev) => !prev)}
-              className="rounded-full cursor-pointer"
+              className="cursor-pointer rounded-full"
               src={Profile!}
               alt="profile"
               width={28}
               height={28}
             />
             {toggle ? (
-                <div className="fixed lg:absolute inset-0 bg-black lg:bg-none bg-opacity-70 lg:bg-opacity-0 z-50">
-                  {/* Black background with opacity */}
+              <div className="fixed inset-0 z-50 bg-black bg-opacity-70 lg:absolute lg:bg-opacity-0 lg:bg-none">
+                {/* Black background with opacity */}
                 <div
                   ref={sidebarRef}
-                  className="w-[200px] p-5 shadow-md flex gap-5 flex-col justify-between absolute top-14 right-5 bg-gray-950 rounded-2xl z-50"
-                >
-                  <span onClick={()=>setToggle(false)} className="text-green-500">
+                  className="absolute right-5 top-14 z-50 flex w-[200px] flex-col justify-between gap-5 rounded-2xl bg-gray-950 p-5 shadow-md">
+                  <span className="text-green-500">
                     @ {sessionData ? sessionData.user.name : null}
                   </span>
-                  <Link href={"/post/create"}>Create post</Link>
-                  <button
-                    type="button"
-                    onClick={() => void signOut()}
-                    className="text-red-500"
-                  >
+                  {dataUser?.user?.role === 'USER' ? (
+                    <Link onClick={() => setToggle(false)} href={'/post/create'}>
+                      Create post
+                    </Link>
+                  ) : null}
+
+                  <button type="button" onClick={() => void signOut()} className="text-red-500">
                     Sign Out
                   </button>
                 </div>
               </div>
             ) : null}
           </>
-        ) : (
+        ) : null}
+        {!sessionData && !isLoading ? (
           <button onClick={() => void signIn()} type="button">
             Login
           </button>
-        )}
+        ) : null}
       </div>
     </nav>
   );
