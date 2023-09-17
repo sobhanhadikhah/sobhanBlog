@@ -45,7 +45,7 @@ function Navbar() {
                   <span className="text-green-500">
                     @ {sessionData ? sessionData.user.name : null}
                   </span>
-                  {dataUser?.user?.role === 'USER' ? (
+                  {dataUser?.user?.role === 'ADMIN' ? (
                     <Link onClick={() => setToggle(false)} href={'/post/create'}>
                       Create post
                     </Link>
