@@ -1,0 +1,47 @@
+/* components/Sky.module.css */
+.sky {
+  z-index: -10;
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  background: black;
+  overflow: hidden;
+}
+
+.star {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: #fff;
+  border-radius: 50%;
+  animation: flicker 1s infinite alternate;
+}
+
+@keyframes flicker {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.meteorite {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background: #ff0000;
+  border-radius: 50%;
+  animation: meteorite-fall 4s linear infinite;
+}
+
+@keyframes meteorite-fall {
+  0% {
+    transform: translateX(100%);
+    bottom: -10px;
+  }
+  100% {
+    transform: translateX(-100%);
+    bottom: 110vh;
+  }
+}

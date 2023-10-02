@@ -24,31 +24,29 @@ export const productRouter = createTRPCRouter({
     )
     .mutation(async ({ input, ctx }) => {
       try {
-        await ctx.db.post.create({
+        const createdPost = await ctx.db.post.create({
           data: {
             title: input.title,
             content: input.content,
+            userId: ctx.session.user.id,
             image: input.image || null,
             tags: input.tags,
+            writerInfoEmail: ctx.session.user.email ?? '',
+            writerInfoImage: ctx.session.user.image ?? '',
+            writerInfoName: ctx.session.user.name ?? '',
           },
         });
+
         return {
           status: 200,
-          success: true, // You can return a success message or any other relevant data.
+          success: true,
+          post: createdPost,
         };
       } catch (error) {
-        throw new Error('Error creating a post'); // Handle the error as needed.
+        throw new Error('Error creating a post');
       }
     }),
-  byId: publicProcedure.input(z.object({ id: z.string() })).query(async ({ ctx, input }) => {
-    try {
-      return {
-        post: await ctx.db.post.findFirst({ where: { id: input.id } }),
-      };
-    } catch (error) {
-      throw new Error('Error creating a post'); // Handle the error as needed.
-    }
-  }),
+
   deleteProduct: protectedProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
@@ -62,7 +60,28 @@ export const productRouter = createTRPCRouter({
         throw new Error('Error creating a post'); // Handle the error as needed.
       }
     }),
-  getProductMessage: protectedProcedure.query(() => {
-    return 'this is product route';
+  likePost: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      try {
+        const post = await ctx.db.post.findUnique({ where: { id: input.id } });
+
+        if (post) {
+          const updatedLikes = post.like! + 1;
+          // If the post doesn't exist, you can handle it accordingly (e.g., return an error)
+          const updateProduct = await ctx.db.post.update({
+            where: { id: input.id },
+            data: { like: updatedLikes },
+          });
+          return updateProduct;
+        } else {
+          throw new Error('Post not found');
+        }
+      } catch (error) {}
+    }),
+  byId: publicProcedure.input(z.object({ id: z.string() })).query(async ({ input, ctx }) => {
+    return {
+      post: await ctx.db.post.findFirst({ where: { id: input.id } }),
+    };
   }),
 });

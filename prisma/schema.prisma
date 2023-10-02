@@ -62,9 +62,8 @@ model User {
   emailVerified DateTime?
   image         String?
   accounts      Account[]
-  role         UserRole  @default(USER)
+  role          UserRole  @default(USER)
   sessions      Session[]
-  likes         Like[]
 }
 
 model VerificationToken {
@@ -76,25 +75,24 @@ model VerificationToken {
 }
 
 model Post {
-  id        String   @id @default(cuid())
-  title     String
-  content   String
-  image     String?
-  tags      String[]
-  createdAt DateTime @default(now())
-  likes     Like[]
+  id         String   @id @default(cuid())
+  title      String
+  content    String
+  image      String?
+  tags       String[]
+  createdAt  DateTime @default(now())
+  userId     String
+  like       Int? 
+  writerInfoName String  
+  writerInfoEmail String
+  writerInfoImage String
 }
 
-model Like {
-  id     String @id @default(cuid())
-  userId String
-  postId String
-  user   User   @relation(fields: [userId], references: [id])
-  post   Post   @relation(fields: [postId], references: [id])
-}
+
 
 model Tag {
-  id     String @id @default(cuid())
-  label  String
-  value  String
+  id    String @id @default(cuid())
+  label String
+  value String
 }
+

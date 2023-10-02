@@ -7,6 +7,8 @@ import { api } from '~/utils/api';
 import '~/styles/globals.css';
 import '@radix-ui/themes/styles.css';
 import Navbar from '~/components/layout/navbar';
+import { Toaster } from 'react-hot-toast';
+import Sky from '~/components/sky';
 
 const MyApp: AppType<{ session: Session | null }> = ({
   Component,
@@ -14,10 +16,13 @@ const MyApp: AppType<{ session: Session | null }> = ({
 }) => {
   return (
     <SessionProvider session={session}>
-      <main className="mx-auto max-w-[1240px]">
-        <Navbar />
-        <Component {...pageProps} />
-      </main>
+      <Sky>
+        <main className="mx-auto max-w-[1240px]">
+          <Navbar />
+          <Component {...pageProps} />
+          <Toaster />
+        </main>
+      </Sky>
     </SessionProvider>
   );
 };

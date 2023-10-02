@@ -1,6 +1,7 @@
 import format from 'date-fns/format';
 import { type NextPage } from 'next';
 import { useRouter } from 'next/router';
+import BottomNavigation from '~/components/bottomNavigation';
 import { api } from '~/utils/api';
 
 const PostInfo: NextPage = () => {
@@ -20,24 +21,30 @@ const PostInfo: NextPage = () => {
   }
 
   return (
-    <main className="mx-3">
-      <div>
-        <div className="flex justify-between">
-          <h1 className="text-3xl">{data.post?.title}</h1>
-          {data.post?.createdAt ? format(data.post?.createdAt, 'MMMM dd, yyyy') : null}
-        </div>
-        <div className="flex gap-3">
-          {data.post?.tags.map((item) => (
-            <span key={item}>
-              {' '}
-              <span className="text-blue-500">#</span>
-              {item}
+    <div>
+      <main className="mx-3">
+        <div>
+          <div className="flex justify-between">
+            <h1 className="text-3xl">{data.post?.title}</h1>
+            <span className="text-xs">
+              {data.post?.createdAt ? format(data.post?.createdAt, 'MMMM dd, yyyy') : null}
             </span>
-          ))}
+          </div>
+          <div className="flex gap-3">
+            {data.post?.tags.map((item) => (
+              <span key={item}>
+                {' '}
+                <span className="text-blue-500">#</span>
+                {item}
+              </span>
+            ))}
+          </div>
         </div>
-      </div>
-      <p>{data.post?.content}</p>
-    </main>
+        <p>{data.post?.content}</p>
+      </main>
+      {/* bottom navigation */}
+      <BottomNavigation id={data?.post?.id ?? ''} />
+    </div>
   );
 };
 

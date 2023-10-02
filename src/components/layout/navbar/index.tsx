@@ -1,8 +1,8 @@
+import { Lightbulb, LightbulbFilament } from '@phosphor-icons/react';
 import { signIn, signOut, useSession } from 'next-auth/react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState, useRef } from 'react';
-import Loading from '~/components/elemnt/loading';
 import { useOutsideClick } from '~/hook/useOutsideClick';
 import { api } from '~/utils/api';
 
@@ -21,9 +21,11 @@ function Navbar() {
   });
 
   return (
-    <nav className="sticky top-0  z-50 flex flex-row items-center justify-between gap-3 bg-neutral-900 p-5">
-      <div>
-        <Link href={'/'}>iBlog</Link>
+    <nav className="sticky top-0  z-50 flex flex-row items-center justify-between gap-3  p-5">
+      <div className="items-center">
+        <Link href={'/'}>
+          <LightbulbFilament size={36} className="hover:text-yellow-300" />
+        </Link>
       </div>
       <div>
         {sessionData ? (
@@ -46,11 +48,18 @@ function Navbar() {
                     @ {sessionData ? sessionData.user.name : null}
                   </span>
                   {dataUser?.user?.role === 'ADMIN' ? (
-                    <Link onClick={() => setToggle(false)} href={'/post/create'}>
-                      Create post
-                    </Link>
+                    <>
+                      <Link onClick={() => setToggle(false)} href={'/post/create'}>
+                        Create post
+                      </Link>
+                      <Link onClick={() => setToggle(false)} href={'/dashboard'}>
+                        Dashboard
+                      </Link>
+                    </>
                   ) : null}
-
+                  <Link onClick={() => setToggle(false)} href={'/about'}>
+                    About
+                  </Link>
                   <button type="button" onClick={() => void signOut()} className="text-red-500">
                     Sign Out
                   </button>

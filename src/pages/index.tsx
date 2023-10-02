@@ -4,7 +4,7 @@ import Loading from '~/components/elemnt/loading';
 import { api } from '~/utils/api';
 import { ScrollArea } from '@radix-ui/themes';
 export default function Home() {
-  const posts = api.post.getAll.useQuery();
+  const { data, refetch, isLoading } = api.post.getAll.useQuery();
 
   return (
     <>
@@ -16,8 +16,8 @@ export default function Home() {
 
       <ScrollArea type="always" scrollbars="vertical">
         <main className="grid grid-cols-12 items-center justify-center gap-5 p-5  ">
-          {!posts.isLoading ? (
-            posts.data?.map((item) => <Cart refetch={posts.refetch} key={item.id} {...item} />)
+          {!isLoading ? (
+            data?.map((item) => <Cart refetch={refetch} key={item.id} {...item} />)
           ) : (
             <Loading />
           )}
