@@ -62,8 +62,11 @@ model User {
   emailVerified DateTime?
   image         String?
   accounts      Account[]
+  likes         Like[]
   role          UserRole  @default(USER)
+  comment     Comment[]
   sessions      Session[]
+  posts         Post[]
 }
 
 model VerificationToken {
@@ -72,6 +75,24 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+model Like {
+  id        String   @id @default(cuid())
+  userId    String
+  postId    String
+  likedAt   DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id])
+  post      Post     @relation(fields: [postId], references: [id],onDelete: Cascade)
+}
+model Comment {
+  id  String @id @default(cuid())
+  userId    String
+  postId    String
+  commentAt DateTime @default(now())
+  text      String
+  user      User     @relation(fields: [userId], references: [id])
+  post      Post     @relation(fields: [postId], references: [id],onDelete: Cascade)
 }
 
 model Post {
@@ -82,11 +103,14 @@ model Post {
   tags       String[]
   createdAt  DateTime @default(now())
   userId     String
-  like       Int? 
+  like       Like[] 
+  comment    Comment[]
+  user       User @relation(fields: [userId],references: [id],onDelete: Cascade) 
   writerInfoName String  
   writerInfoEmail String
   writerInfoImage String
 }
+
 
 
 

@@ -21,7 +21,7 @@ function Navbar() {
   });
 
   return (
-    <nav className="sticky top-0  z-50 flex flex-row items-center justify-between gap-3  p-5">
+    <nav className="sticky top-0 z-50  flex flex-row items-center justify-between gap-3 bg-black  p-5">
       <div className="items-center">
         <Link href={'/'}>
           <LightbulbFilament size={36} className="hover:text-yellow-300" />

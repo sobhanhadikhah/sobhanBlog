@@ -15,7 +15,7 @@ export default function Home() {
       </Head>
 
       <ScrollArea type="always" scrollbars="vertical">
-        <main className="grid grid-cols-12 items-center justify-center gap-5 p-5  ">
+        <main className="grid grid-cols-12 items-center justify-center  gap-y-2  ">
           {!isLoading ? (
             data?.map((item) => <Cart refetch={refetch} key={item.id} {...item} />)
           ) : (

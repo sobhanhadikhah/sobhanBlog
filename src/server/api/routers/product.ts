@@ -2,16 +2,8 @@ import { z } from 'zod';
 import { createTRPCRouter, protectedProcedure, publicProcedure } from '~/server/api/trpc';
 
 export const productRouter = createTRPCRouter({
-  hello: publicProcedure
-    .input(z.object({ title: z.string(), content: z.string() }))
-    .query(({ input }) => {
-      return {
-        greeting: `Hello ${input.title}`,
-      };
-    }),
-
   getAll: publicProcedure.query(({ ctx }) => {
-    return ctx.db.post.findMany();
+    return ctx.db.post.findMany({ include: { like: true, comment: true, user: true } });
   }),
   createPost: protectedProcedure
     .input(
@@ -53,35 +45,79 @@ export const productRouter = createTRPCRouter({
       try {
         await ctx.db.post.delete({ where: { id: input.id } });
         return {
+          message: 'Delete it !',
           status: 200,
           success: true,
         };
       } catch (error) {
-        throw new Error('Error creating a post'); // Handle the error as needed.
+        throw new Error('Error deleting a product'); // Handle the error as needed.
       }
     }),
   likePost: protectedProcedure
-    .input(z.object({ id: z.string() }))
+    .input(z.object({ userId: z.string(), postId: z.string() }))
     .mutation(async ({ ctx, input }) => {
       try {
-        const post = await ctx.db.post.findUnique({ where: { id: input.id } });
-
+        const post = await ctx.db.like.findFirst({
+          where: { userId: input.userId, postId: input.postId },
+        });
         if (post) {
-          const updatedLikes = post.like! + 1;
-          // If the post doesn't exist, you can handle it accordingly (e.g., return an error)
-          const updateProduct = await ctx.db.post.update({
-            where: { id: input.id },
-            data: { like: updatedLikes },
+          await ctx.db.like.delete({
+            where: { userId: input.userId, postId: input.postId, id: post.id },
           });
-          return updateProduct;
         } else {
-          throw new Error('Post not found');
+          await ctx.db.like.create({
+            data: { userId: input.userId, postId: input.postId },
+          });
         }
+        return {
+          status: 200,
+          success: true,
+        };
+      } catch (error) {
+        return {
+          status: 500,
+          success: true,
+        };
+      }
+    }),
+  isUserLike: protectedProcedure
+    .input(z.object({ userId: z.string(), postId: z.string() }))
+    .query(async ({ ctx, input }) => {
+      try {
+        const like = await ctx.db.like.findFirst({
+          where: { userId: input.userId, postId: input.postId },
+        });
+        return {
+          isLike: !!like,
+          status: 200,
+          success: true,
+        };
       } catch (error) {}
     }),
+  createComment: protectedProcedure
+    .input(z.object({ userId: z.string(), postId: z.string(), text: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      try {
+        const comment = await ctx.db.comment.create({
+          data: { userId: input.userId, postId: input.postId, text: input.text },
+        });
+        return {
+          comment,
+          status: 200,
+          message: 'Comment Create it .',
+          success: true,
+        };
+      } catch (error) {
+        throw new Error('Something went wrong');
+      }
+    }),
+
   byId: publicProcedure.input(z.object({ id: z.string() })).query(async ({ input, ctx }) => {
     return {
-      post: await ctx.db.post.findFirst({ where: { id: input.id } }),
+      post: await ctx.db.post.findFirst({
+        where: { id: input.id },
+        include: { like: true, user: true, comment: { include: { user: true } } },
+      }),
     };
   }),
 });

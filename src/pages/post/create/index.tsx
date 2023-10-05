@@ -2,12 +2,14 @@
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 /* eslint-disable @typescript-eslint/no-misused-promises */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-'use client';
 import { useState } from 'react';
 import { api } from '~/utils/api';
 import CreatableSelect from 'react-select/creatable';
 import { type MultiValue } from 'react-select';
 import toast from 'react-hot-toast';
+import { MdEditor } from 'md-editor-rt';
+import 'md-editor-rt/lib/style.css';
+
 import { useRouter } from 'next/router';
 import Button from '~/components/elemnt/button';
 interface Post {
@@ -22,9 +24,8 @@ interface Option {
 }
 
 const inputStyle =
-  'bg-transparent col-span-12 md:col-span-6 item-center outline-none focus:outline-none border-b px-3 w-full';
-const textAreaStyle =
-  'bg-transparent col-span-12  item-center outline-none focus:outline-none border-b px-3 w-full';
+  'bg-transparent col-span-12 text-3xl font-extrabold md:col-span-6 item-center outline-none focus:outline-none border-b px-3 w-full';
+
 function CreatePost() {
   const router = useRouter();
   const { mutate: createPost, isLoading: isLoadingCreatePost } = api.post.createPost.useMutation({
@@ -99,26 +100,33 @@ function CreatePost() {
               isClearable
               isDisabled={createTagLoading}
               isLoading={createTagLoading || tagsLoading}
-              onChange={(newValue) => setValueSelect(newValue)}
+              onChange={(newValue) => {
+                setValueSelect(newValue);
+              }}
               onCreateOption={handleCreate}
               options={tagsData}
               value={valueSelect}
             />
             {/* Content */}
-            <textarea
-              rows={15}
-              className={textAreaStyle}
-              value={value.content}
-              onChange={(e) => setValue((prev) => ({ ...prev, content: e.target.value }))}
-              name="content"
-              placeholder="Content..."
+            <MdEditor
+              preview={false}
+              showToolbarName
+              noPrettier={false}
+              autoDetectCode
+              showCodeRowNumber
+              language="en-US"
+              className="col-span-12 w-full"
+              modelValue={value.content}
+              onChange={(e) => setValue((prev) => ({ ...prev, content: e }))}
             />
-            <Button
-              isLoading={isLoadingCreatePost}
-              type="submit"
-              className="col-span-12 w-full rounded-md bg-sky-500 ">
-              Post
-            </Button>
+            <div>
+              <Button
+                isLoading={isLoadingCreatePost}
+                type="submit"
+                className="col-span-6   rounded-md bg-sky-500 ">
+                Publish
+              </Button>
+            </div>
           </div>
         </form>
       </div>

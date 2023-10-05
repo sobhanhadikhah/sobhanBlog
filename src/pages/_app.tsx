@@ -8,6 +8,7 @@ import '~/styles/globals.css';
 import '@radix-ui/themes/styles.css';
 import Navbar from '~/components/layout/navbar';
 import { Toaster } from 'react-hot-toast';
+
 import Sky from '~/components/sky';
 
 const MyApp: AppType<{ session: Session | null }> = ({
@@ -17,7 +18,9 @@ const MyApp: AppType<{ session: Session | null }> = ({
   return (
     <SessionProvider session={session}>
       <Sky>
-        <main className="mx-auto max-w-[1240px]">
+        <main
+          style={{ scrollBehavior: 'smooth' }}
+          className="mx-auto h-full max-w-3xl  overflow-auto  ">
           <Navbar />
           <Component {...pageProps} />
           <Toaster />
