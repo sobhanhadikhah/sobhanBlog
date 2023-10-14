@@ -3,12 +3,13 @@
 /* eslint-disable prettier/prettier */
 import { BookmarkSimple, ChatCircle, Heart } from '@phosphor-icons/react';
 import { type NextPage } from 'next';
-import toast from 'react-hot-toast';
 import { api } from '~/utils/api';
 import Share from '../buttonShare';
-import * as Tooltip from '@radix-ui/react-tooltip';
 import ToolTip from '../toolTip';
 import Link from 'next/link';
+import { useState } from 'react';
+import { type _count } from '~/types/post/index.';
+import { type Favorite } from '@prisma/client';
 interface likes {
   id:string,
   postId:string,
@@ -28,46 +29,91 @@ type Props ={
   Comment: Comment[] | undefined
   userId:string,
   refetchPost: CallableFunction
+  _count : _count | undefined,
+  favorite: Favorite[] | undefined
+  
 }
-const BottomNavigation: NextPage<Props> = ({userId,postId,likes,refetchPost,Comment}) => {
+const BottomNavigation: NextPage<Props> = ({userId,postId,refetchPost,_count,favorite}) => {
+  const [isLike, setIsLike] = useState(false);
+  const [likeCount, setLikeCount] = useState(_count?.like ?? 0)
+  const [isSaved, setIsSaved] = useState(!!favorite?.length);
   const Like = api.post.likePost.useMutation({
     onSuccess(){
-      toast.success("like",{id:"like",position:"bottom-center"})
+      
       refetch();
       refetchPost()
+    },
+    onError(){
+      setIsLike((prev)=>(!prev));
+      setLikeCount((prev)=>(prev-1))
     }
   }) ;
-  const {data,refetch} = api.post.isUserLike.useQuery({userId:userId,postId:postId}); 
-  function handleLike(postId:string,userId:string){
-    toast.loading("liking...",{id:"like",position:"bottom-center"})
-    Like.mutate({userId:userId , postId:postId})
+  const {refetch} = api.post.isUserLike.useQuery({userId:userId,postId:postId},{
+    onSuccess(data){
+      if (data?.isLike) {
+        setIsLike(data?.isLike)
+      }
+    }
+  }); 
+  function handleLike(postId:string, userId:string) {
+    if (isLike) {
+      setLikeCount((prev) => prev - 1);
+    } else {
+      setLikeCount((prev) => prev + 1);
+    }
+    Like.mutate({ userId: userId, postId: postId });
   }
-  
+  const { isLoading: isLoadingFavorite, mutate: mutateFavorite } = api.post.setFavorite.useMutation(
+    {
+      onError() {
+        setIsSaved((prev) => !prev);
+      },
+      onSuccess() {
+        refetchPost();
+      },
+    },
+  );
+  function handleSetFavorite() {
+    mutateFavorite({ postId });
+  }
   
   return  (
     <>
-  <div className="fixed bottom-12 max-w-2xl mx-auto  z-30 left-10 right-10 block  rounded-full  bg-black  shadow-sm    ">
+  <div className="fixed md:bottom-12 bottom-0 md:max-w-2xl  mx-auto  !z-[90000] w-full md:left-10 md:right-10 block  md:rounded-full  bg-black  shadow-sm    ">
   <div className="  flex  w-full items-center  justify-around gap-5 p-3  ">
     
     <ToolTip content='like' >
-    <button type='button' disabled={Like.isLoading} className='flex gap-2' onClick={()=>handleLike(postId,userId)} >
-     {likes?.length} <Heart color='red' size={28} weight={data?.isLike ? "fill" : "regular"}  />
+    <button type='button' disabled={Like.isLoading} className='flex gap-2'
+     onClick={()=>{
+      setIsLike((prev)=>(!prev))
+      handleLike(postId,userId)}
+      } >
+     {likeCount} <Heart color='red' size={28} weight={isLike ? "fill" : "regular"}  />
     </button>
     </ToolTip>
-    
+    <ToolTip content='Jump to Comments' >
     <Link href={"#commentSection"} scroll={false}  className='flex gap-2' >
-      {Comment?.length}
+      {_count?.comment}
       <ChatCircle size={28} />
     </Link>
-    <button type='button' >
-    <BookmarkSimple size={36}  />
+      </ToolTip>
+      <ToolTip content='Save' >
+
+    <button  disabled={isLoadingFavorite} onClick={()=>{
+      setIsSaved((prev)=> (!prev))
+      handleSetFavorite()
+    }}  type='button' className='flex items-center'  >
+      {_count?.favorite}
+    <BookmarkSimple size={36} weight={isSaved ? "fill" : "regular" }  />
     </button>
+      </ToolTip>
+      <ToolTip content='Share' >
     <Share title='hello' content='velo' />
+      </ToolTip>
     
   </div>
 </div>
-<div className='fixed bottom-0 bg-gradient-to-b from-black   to-white bg-opacity-50 w-full z-20 h-[110px] block
- md:hidden opacity-60 ' />
+
 </>
 );
 };

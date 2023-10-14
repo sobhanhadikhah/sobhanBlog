@@ -1,45 +1,30 @@
 import { type NextPage } from 'next';
-import Button from '../button';
 import format from 'date-fns/format';
 import { api } from '~/utils/api';
 import toast from 'react-hot-toast';
 import { TrashSimple, Spinner, BookmarkSimple, Heart, Chat } from '@phosphor-icons/react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useState } from 'react';
+import { type _count } from '~/types/post/index.';
+import { type User, type Favorite, type Like, type Tag } from '@prisma/client';
 
-type User = {
-  id: string;
-  name: string | null;
-  email: string | null;
-  emailVerified: Date | null;
-  image: string | null;
-};
-type Comment = {
-  id: string;
-  userId: string;
-  postId: string;
-  commentAt: Date;
-  text: string;
-};
-type like = {
-  id: string;
-  userId: string;
-  postId: string;
-  likedAt: Date;
-};
 interface Props {
   title: string;
   id: string;
   content: string;
   createdAt: Date;
-  tags?: string[] | undefined;
+  tags?: Tag[] | undefined;
   refetch: CallableFunction;
-  user: User;
-  like: like[];
-  comment: Comment[];
+  user?: User;
+  like?: Like[];
+  comment?: Comment[];
+  favorite?: Favorite[];
+  _count?: _count;
 }
 
-const Cart: NextPage<Props> = ({ title, id, createdAt, tags, refetch, user, like, comment }) => {
+const Cart: NextPage<Props> = ({ title, id, createdAt, tags, refetch, user, favorite, _count }) => {
+  const [isSaved, setIsSaved] = useState(!!favorite?.length);
   // Format the date as "MonthName Day, Year"
   const formattedDate = format(createdAt, 'MMMM dd, yyyy');
   const { mutate, isLoading: isLoadingRemove } = api.post.deleteProduct.useMutation({
@@ -51,10 +36,21 @@ const Cart: NextPage<Props> = ({ title, id, createdAt, tags, refetch, user, like
       toast.error(`error`, { id: 'postDe' });
     },
   });
+  const { isLoading: isLoadingFavorite, mutate: mutateFavorite } = api.post.setFavorite.useMutation(
+    {
+      onError() {
+        setIsSaved((prev) => !prev);
+      },
+    },
+  );
   function deletePostHandle() {
     toast.loading('removing', { id: 'postDe' });
     mutate({ id });
   }
+  function handleSetFavorite() {
+    mutateFavorite({ postId: id });
+  }
+
   return (
     <div className="z-50 col-span-12 h-full rounded-none bg-[#171717] md:rounded-md  ">
       <div
@@ -63,15 +59,17 @@ const Cart: NextPage<Props> = ({ title, id, createdAt, tags, refetch, user, like
         <div>
           {/* User info */}
           <div className="align-center flex items-center gap-3">
-            <Image
-              className="rounded-full"
-              src={user?.image ?? ''}
-              alt="profile"
-              width={32}
-              height={32}
-            />
+            {user?.image ? (
+              <Image
+                className="rounded-full"
+                src={user?.image}
+                alt="profile"
+                width={32}
+                height={32}
+              />
+            ) : null}
             <div className="flex flex-col">
-              <span className="text-base font-semibold ">{user.name}</span>
+              <span className="text-base font-semibold ">{user?.name}</span>
               <span className="text-sm font-thin text-gray-300 ">{formattedDate}</span>
             </div>
           </div>
@@ -80,7 +78,7 @@ const Cart: NextPage<Props> = ({ title, id, createdAt, tags, refetch, user, like
           {/* header */}
           <div className="flex items-center justify-between ">
             <Link
-              href={`post/${id}`}
+              href={`/post/${id}`}
               className="text-xl font-bold  capitalize text-white hover:text-sky-200 md:text-3xl ">
               {title}
             </Link>
@@ -97,39 +95,47 @@ const Cart: NextPage<Props> = ({ title, id, createdAt, tags, refetch, user, like
           {/* Tags */}
           <div className="mt-3 flex flex-wrap gap-3  text-sm">
             {tags?.map((item) => (
-              <span
-                className="cursor-pointer rounded-md p-1 text-gray-100 ring-white transition-all duration-150 hover:ring-1 "
-                key={item}
+              <Link
+                href={`t/${item.id}`}
+                className="cursor-pointer rounded-md p-1 text-gray-100  transition-all duration-150 hover:bg-[#1f1f1f]"
+                key={item.id}
                 color="blue">
-                #{item}
-              </span>
+                #{item.label}
+              </Link>
             ))}
           </div>
           {/* buttons */}
           <div className="mt-4 flex items-center justify-between ">
             <div className="flex items-center gap-5">
-              {like.length ? (
+              {_count?.like ? (
                 <Link
                   href={`/post/${id}`}
-                  className="flex items-center gap-1 rounded-md p-1 ring-white transition-all duration-150  hover:ring-1">
+                  className="flex items-center gap-1 rounded-md p-1  transition-all duration-150 hover:bg-[#1f1f1f]  ">
                   {' '}
-                  <Heart size={18} color="red" weight="fill" /> <span>{like.length}</span>
+                  <Heart size={18} color="red" weight="fill" /> <span>{_count.like}</span>
                 </Link>
               ) : null}
 
               <Link
                 href={`post/${id}#commentSection`}
-                className="flex items-center gap-1 rounded-md p-1 ring-white transition-all duration-150  hover:ring-1 ">
+                className="flex items-center gap-1 rounded-md p-1  transition-all duration-150  hover:bg-[#1f1f1f] ">
                 {' '}
                 <Chat size={18} />{' '}
                 <div className="flex items-center gap-1 text-sm ">
-                  {comment.length ? comment.length : 'Add'}{' '}
+                  {_count?.comment ? _count.comment : 'Add'}{' '}
                   <span className="hidden md:block">Comments</span>
                 </div>
               </Link>
             </div>
-            <button type="button" className="items-center">
-              <BookmarkSimple size={18} />
+            <button
+              disabled={isLoadingFavorite}
+              onClick={() => {
+                setIsSaved((prev) => !prev);
+                handleSetFavorite();
+              }}
+              type="button"
+              className="items-center p-1 transition-all  duration-150 hover:bg-[#1f1f1f] ">
+              <BookmarkSimple size={18} weight={isSaved ? 'fill' : 'regular'} />
             </button>
           </div>
         </div>

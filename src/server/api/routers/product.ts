@@ -1,10 +1,82 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 import { z } from 'zod';
 import { createTRPCRouter, protectedProcedure, publicProcedure } from '~/server/api/trpc';
 
 export const productRouter = createTRPCRouter({
-  getAll: publicProcedure.query(({ ctx }) => {
-    return ctx.db.post.findMany({ include: { like: true, comment: true, user: true } });
-  }),
+  getAll: publicProcedure
+    .input(
+      z.object({
+        limit: z.number(),
+        cursor: z.string().nullish(),
+        order: z.string().optional().nullable(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      try {
+        const { cursor, limit, order } = input;
+        const orderBy = [];
+
+        // Add the default ordering condition if 'order' is not specified
+        if (!order) {
+          orderBy.push({ createdAt: 'desc' });
+        } else {
+          // Parse the 'order' parameter and add multiple ordering conditions
+          const orderFields = order.split(',');
+
+          for (const field of orderFields) {
+            if (field === 'createdAt') {
+              orderBy.push({ createdAt: 'desc' });
+            } else if (field === 'likeCount') {
+              orderBy.push({ like: { _count: 'desc' } });
+            }
+            // Add more conditions for other fields as needed
+          }
+        }
+        const posts = await ctx.db.post.findMany({
+          take: limit + 1,
+          cursor: cursor ? { id: cursor } : undefined,
+
+          orderBy: orderBy as never[],
+          include: {
+            tags: true,
+            like: true,
+            _count: {
+              select: {
+                like: true,
+                comment: true,
+              },
+            },
+            favorite: {
+              where: {
+                userId: ctx.session?.user.id,
+              },
+            },
+            comment: true,
+            user: true,
+          },
+        });
+
+        let nextCursor: typeof cursor | undefined = undefined;
+        if (posts.length > limit) {
+          const nextItem = posts.pop(); // return the last item from the array
+          nextCursor = nextItem?.id;
+        }
+        const count = await ctx.db.post.count();
+        const totalPages = Math.ceil(count / input.limit);
+
+        return {
+          posts,
+          nextCursor,
+          count,
+          totalPages,
+        };
+      } catch (error) {
+        // Handle errors appropriately
+        throw error;
+      }
+    }),
   createPost: protectedProcedure
     .input(
       z.object({
@@ -16,13 +88,16 @@ export const productRouter = createTRPCRouter({
     )
     .mutation(async ({ input, ctx }) => {
       try {
+        const tagIds = input.tags;
         const createdPost = await ctx.db.post.create({
           data: {
             title: input.title,
             content: input.content,
             userId: ctx.session.user.id,
             image: input.image || null,
-            tags: input.tags,
+            tags: {
+              connect: tagIds.map((tagId) => ({ id: tagId })), // Connect the provided tag IDs to the post
+            },
             writerInfoEmail: ctx.session.user.email ?? '',
             writerInfoImage: ctx.session.user.image ?? '',
             writerInfoName: ctx.session.user.name ?? '',
@@ -80,6 +155,24 @@ export const productRouter = createTRPCRouter({
         };
       }
     }),
+  createCategory: protectedProcedure
+    .input(z.object({ label: z.string(), value: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      try {
+        const { label, value } = input;
+        const category = await ctx.db.category.create({
+          data: { label, value },
+        });
+        return {
+          category,
+          status: 200,
+          message: 'category Create it .',
+          success: true,
+        };
+      } catch (error) {
+        throw new Error('Something went wrong');
+      }
+    }),
   isUserLike: protectedProcedure
     .input(z.object({ userId: z.string(), postId: z.string() }))
     .query(async ({ ctx, input }) => {
@@ -111,12 +204,42 @@ export const productRouter = createTRPCRouter({
         throw new Error('Something went wrong');
       }
     }),
+  setFavorite: protectedProcedure
+    .input(z.object({ postId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      try {
+        const isFavorite = await ctx.db.favorite.findFirst({
+          where: { userId: ctx.session.user.id, postId: input.postId },
+        });
+        if (isFavorite) {
+          await ctx.db.favorite.delete({
+            where: { postId: input.postId, userId: ctx.session.user.id, id: isFavorite.id },
+          });
+        } else {
+          await ctx.db.favorite.create({
+            data: { postId: input.postId, userId: ctx.session.user.id },
+          });
+        }
+        return {
+          status: 200,
+          message: 'Post Saved.',
+          success: true,
+        };
+      } catch (error) {}
+    }),
 
   byId: publicProcedure.input(z.object({ id: z.string() })).query(async ({ input, ctx }) => {
     return {
       post: await ctx.db.post.findFirst({
         where: { id: input.id },
-        include: { like: true, user: true, comment: { include: { user: true } } },
+        include: {
+          like: true,
+          user: true,
+          tags: true,
+          favorite: { where: { userId: ctx.session?.user.id } },
+          comment: { include: { user: true } },
+          _count: { select: { like: true, comment: true, favorite: true } },
+        },
       }),
     };
   }),

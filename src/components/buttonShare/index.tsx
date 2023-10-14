@@ -19,9 +19,9 @@ function Share({sizeIcon=28,}: Props) {
               text: 'Check out this awesome website!',
               url: window.location.href,
             });
-            console.log('Successfully shared');
+            
           } else {
-            console.log('Web Share API not supported.');
+          
           }
         } catch (error) {
           console.error('Error sharing:', error);

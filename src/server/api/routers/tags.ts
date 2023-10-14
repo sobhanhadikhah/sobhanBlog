@@ -9,18 +9,67 @@ export const tagsRouter = createTRPCRouter({
     .input(z.object({ label: z.string(), value: z.string() }))
     .mutation(async ({ input, ctx }) => {
       try {
-        await ctx.db.tag.create({
-          data: { label: input.label, value: input.value },
+        const isTag = await ctx.db.tag.findFirst({
+          where: { value: input.value, AND: { label: input.label } },
         });
-        return {
-          status: 200,
-          success: true, // You can return a success message or any other relevant data.
-        };
+        if (isTag) {
+          return {
+            message: 'we have tag',
+            status: 200,
+            success: true, // You can return a success message or any other relevant data.
+          };
+        } else {
+          await ctx.db.tag.create({
+            data: { label: input.label, value: input.value },
+          });
+          return {
+            status: 200,
+            success: true, // You can return a success message or any other relevant data.
+          };
+        }
       } catch (error) {
         throw new Error('Error creating a tag');
       }
     }),
+  postByTag: publicProcedure.input(z.object({ id: z.string() })).query(async ({ ctx, input }) => {
+    try {
+      const posts = await ctx.db.post.findMany({
+        include: {
+          tags: true,
+          user: true,
+          comment: true,
+          like: true,
+          _count: {
+            select: {
+              comment: true,
+              like: true,
+              favorite: true,
+            },
+          },
+        },
+        where: {
+          tags: {
+            some: {
+              id: input.id,
+            },
+          },
+        },
+      });
+      return {
+        posts,
+        status: 200,
+        success: true,
+      };
+    } catch (error) {}
+  }),
   getAllTag: publicProcedure.query(({ ctx }) => {
-    return ctx.db.tag.findMany();
+    return ctx.db.tag.findMany({
+      orderBy: {
+        posts: {
+          _count: 'desc',
+        },
+      },
+      include: { _count: { select: { posts: true } } },
+    });
   }),
 });

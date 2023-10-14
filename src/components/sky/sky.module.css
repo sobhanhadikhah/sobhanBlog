@@ -1,11 +1,11 @@
 /* components/Sky.module.css */
 .sky {
-  
   position: relative;
   width: 100%;
-  height: 100vh;
+  height: calc(100vh - 65px);
   background: black;
-  overflow: hidden;
+  overflow: auto;
+  z-index: 0 !important ; /* Set the z-index for the sky container */
 }
 
 .star {
@@ -15,6 +15,7 @@
   background: #fff;
   border-radius: 50%;
   animation: flicker 1s infinite alternate;
+  z-index: 1 !important ; /* Set the z-index for the stars */
 }
 
 @keyframes flicker {
@@ -33,6 +34,7 @@
   background: #ff0000;
   border-radius: 50%;
   animation: meteorite-fall 4s linear infinite;
+  z-index: 1; /* Set the z-index for the meteorites */
 }
 
 @keyframes meteorite-fall {

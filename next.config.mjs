@@ -3,7 +3,6 @@
  * for Docker builds.
  */
 await import('./src/env.mjs');
-import removeImports from 'next-remove-imports';
 
 /** @type {import("next").NextConfig} */
 const config = {
@@ -19,8 +18,7 @@ const config = {
   images: {
     domains: ['cdn.discordapp.com'],
   },
-  transpilePackages: ['@uiw/react-md-editor'],
-  cssModules: false,
+  output: 'standalone',
 };
 
-export default removeImports()(config);
+export default config;

@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-floating-promises */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { Chat } from '@phosphor-icons/react';
+import { Warning } from '@phosphor-icons/react';
 import format from 'date-fns/format';
 import { MdPreview } from 'md-editor-rt';
 import { type NextPage } from 'next';
@@ -16,6 +16,7 @@ import BottomNavigation from '~/components/bottomNavigation';
 import { api } from '~/utils/api';
 import 'md-editor-rt/lib/preview.css';
 import Link from 'next/link';
+import Loading from '~/components/elemnt/loading';
 const PostInfo: NextPage = () => {
   const { query } = useRouter();
   const [value, setValue] = useState('');
@@ -32,11 +33,19 @@ const PostInfo: NextPage = () => {
   const { data, isLoading, isError, refetch } = api.post.byId.useQuery({ id });
 
   if (isLoading) {
-    return <h1>Loading...</h1>;
+    return (
+      <div>
+        <Loading />
+      </div>
+    );
   }
 
   if (isError) {
-    return <h1>Error loading post</h1>;
+    return (
+      <h1>
+        <Warning />
+      </h1>
+    );
   }
   function handleComment(postId: string, text: string, userId: string | undefined) {
     if (text && userId) {
@@ -47,20 +56,24 @@ const PostInfo: NextPage = () => {
   return (
     <div>
       <main>
-        <div className="mx-3">
-          <div className="flex items-center gap-2 ">
-            <Image
-              src={data.post?.user.image ?? ''}
-              className="rounded-sm"
-              alt="name"
-              width={40}
-              height={40}
-            />
+        <div className="!z-[50] bg-black  px-3  md:rounded-md  ">
+          <div className="flex items-center gap-2  ">
+            {data.post?.user.image ? (
+              <Image
+                src={data.post?.user.image}
+                className="rounded-sm"
+                alt="name"
+                width={40}
+                height={40}
+              />
+            ) : null}
+
             <div>
-              <Link href={'/'} className="font-semibold">
+              <Link href={'/'} className="font-semibold hover:text-blue-300 ">
                 {data.post?.user.name}
               </Link>
-              <p className="text-xs">
+              <p className="text-xs text-gray-400 ">
+                Posted on{' '}
                 {data.post?.createdAt ? format(data.post?.createdAt, 'MMM dd, yyyy') : null}
               </p>
             </div>
@@ -69,20 +82,20 @@ const PostInfo: NextPage = () => {
             <h1 className="text-4xl font-bold md:text-7xl ">{data.post?.title}</h1>
           </div>
           {/* tags */}
-          <div className="my-3 flex gap-3 ">
-            {data.post?.tags.map((item) => (
-              <span key={item}>
-                {' '}
-                <span className="text-blue-500">#</span>
-                {item}
-              </span>
-            ))}
-          </div>
         </div>
         {/* content */}
-        <div className="pb-10 ">
+        <div className=" pb-10 ">
+          <div className=" flex gap-3 bg-black px-3 pt-3 ">
+            {data.post?.tags.map((item) => (
+              <Link href={`/t/${item.id}`} key={item.id}>
+                {' '}
+                <span className="text-blue-500">#</span>
+                {item.label}
+              </Link>
+            ))}
+          </div>
           <MdPreview
-            style={{ backgroundColor: '#1717190' }}
+            style={{ backgroundColor: '#000', zIndex: '400' }}
             showCodeRowNumber
             modelValue={data.post?.content ?? ''}
             theme="dark"
@@ -113,7 +126,7 @@ const PostInfo: NextPage = () => {
             </div>
           </div>
 
-          <div className="flex flex-col gap-5 pt-10 ">
+          <div className="flex flex-col gap-5 pt-10 font-mono ">
             {data.post?.comment.map((item) => (
               <div key={item.id} className="grid grid-cols-12 gap-1 ">
                 <div className="col-span-1 flex items-center gap-3  ">
@@ -127,10 +140,12 @@ const PostInfo: NextPage = () => {
                     />
                   </span>
                 </div>
-                <div className="col-span-10 flex flex-col rounded-lg border border-gray-600 p-2 text-lg">
-                  <div className="flex gap-2 pb-3 text-base text-gray-300 ">
-                    <span>{item.user.name}</span>
-                    <span>{item.commentAt ? format(item.commentAt, 'MMM dd, yy') : null}</span>
+                <div className="col-span-10 flex flex-col  rounded-lg border border-gray-600 p-2 text-lg">
+                  <div className="flex items-center gap-2  pb-3  ">
+                    <span className="text-base font-semibold">{item.user.name}</span>
+                    <span className="text-gray-300">
+                      {item.commentAt ? format(item.commentAt, 'MMM dd, yy') : null}
+                    </span>
                   </div>
                   {item.text}
                 </div>
@@ -141,6 +156,8 @@ const PostInfo: NextPage = () => {
       </main>
       {/* bottom navigation */}
       <BottomNavigation
+        favorite={data.post?.favorite}
+        _count={data.post?._count}
         Comment={data.post?.comment}
         likes={data?.post?.like}
         postId={data?.post?.id ?? ''}

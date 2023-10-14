@@ -17,11 +17,11 @@ const MyApp: AppType<{ session: Session | null }> = ({
 }) => {
   return (
     <SessionProvider session={session}>
+      <Navbar />
       <Sky>
         <main
           style={{ scrollBehavior: 'smooth' }}
-          className="mx-auto h-full max-w-3xl  overflow-auto  ">
-          <Navbar />
+          className=" mx-auto h-full  max-w-7xl overflow-auto py-2  ">
           <Component {...pageProps} />
           <Toaster />
         </main>

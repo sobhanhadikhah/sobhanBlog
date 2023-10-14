@@ -5,6 +5,7 @@
 import { useState } from 'react';
 import { api } from '~/utils/api';
 import CreatableSelect from 'react-select/creatable';
+import Select from 'react-select';
 import { type MultiValue } from 'react-select';
 import toast from 'react-hot-toast';
 import { MdEditor } from 'md-editor-rt';
@@ -21,13 +22,12 @@ interface Post {
 interface Option {
   label: string;
   value: string;
+  id: string;
 }
-
-const inputStyle =
-  'bg-transparent col-span-12 text-3xl font-extrabold md:col-span-6 item-center outline-none focus:outline-none border-b px-3 w-full';
 
 function CreatePost() {
   const router = useRouter();
+  const { data: categoryData } = api.category.getCategory.useQuery();
   const { mutate: createPost, isLoading: isLoadingCreatePost } = api.post.createPost.useMutation({
     onSuccess() {
       toast.success('Ok', { id: 'post' });
@@ -66,11 +66,11 @@ function CreatePost() {
     }
     if (valueSelect) {
       toast.loading('loading...', { id: 'post' });
-      const label = valueSelect?.map((item) => item.label);
+      const tagsId = valueSelect?.map((item) => item.id);
       createPost({
         title: value.title,
         content: value.content,
-        tags: label,
+        tags: tagsId,
         image: '',
       });
     }
@@ -79,24 +79,24 @@ function CreatePost() {
   };
 
   return (
-    <div className="h-screen w-full">
-      <div className="">
-        <form onSubmit={handleSubmit} className="mx-3">
-          <h1 className="py-10 text-3xl ">Create Post</h1>
-          <div className="grid grid-cols-12  items-center justify-center gap-5">
+    <div className=" mt-5  w-full !overflow-hidden  ">
+      <div className="!overflow-hidden">
+        <form onSubmit={handleSubmit} className="mx-3 !overflow-hidden">
+          <div className="grid grid-cols-12 items-center justify-center  gap-5 !overflow-hidden ">
             {/* Title */}
             <input
               value={value.title}
-              className={inputStyle}
+              className="item-center col-span-12 w-full 
+                bg-transparent px-3 text-3xl font-extrabold outline-none focus:outline-none"
               onChange={(e) => setValue((prev) => ({ ...prev, title: e.target.value }))}
               type="text"
               name="title"
-              placeholder="Title"
+              placeholder="Your Title is here"
             />
             <CreatableSelect
-              placeholder="Create or Select Tag"
+              placeholder="Create or Select Tags"
               isMulti
-              className="col-span-12 w-full text-black md:col-span-6  "
+              className="z-[610] col-span-12 w-full bg-black text-black md:col-span-6  "
               isClearable
               isDisabled={createTagLoading}
               isLoading={createTagLoading || tagsLoading}
@@ -107,8 +107,20 @@ function CreatePost() {
               options={tagsData}
               value={valueSelect}
             />
+            <Select
+              isSearchable
+              placeholder="select category  "
+              isMulti
+              className="z-[600] col-span-12 w-full text-black md:col-span-6  "
+              isDisabled={createTagLoading}
+              isLoading={createTagLoading || tagsLoading}
+              options={categoryData?.categories}
+            />
+
             {/* Content */}
             <MdEditor
+              style={{ zIndex: 500, color: 'white', height: 'calc(100vh - 322px)' }}
+              theme="dark"
               preview={false}
               showToolbarName
               noPrettier={false}
@@ -119,6 +131,7 @@ function CreatePost() {
               modelValue={value.content}
               onChange={(e) => setValue((prev) => ({ ...prev, content: e }))}
             />
+
             <div>
               <Button
                 isLoading={isLoadingCreatePost}
