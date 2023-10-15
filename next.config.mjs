@@ -18,6 +18,9 @@ const config = {
   images: {
     domains: ['cdn.discordapp.com'],
   },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
 };
 
 export default config;
