@@ -1,9 +1,13 @@
 /* eslint-disable prettier/prettier */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable prettier/prettier */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable prettier/prettier */
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 //@ts-nocheck
 /* eslint-disable prettier/prettier */
 import React, { useEffect, type ReactNode } from 'react';
-import styles from './Sky.module.css';
+import styles from './sky.module.css';
 
 interface Props {
   children: ReactNode;
