@@ -6,7 +6,7 @@ import Head from 'next/head';
 import Cart from '~/components/elemnt/cart';
 import { api } from '~/utils/api';
 import { useState } from 'react';
-import { type Post } from '@prisma/client';
+import { type Post } from '~/types/post/index.';
 import { useInView } from 'react-intersection-observer';
 import 'react-loading-skeleton/dist/skeleton.css';
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';

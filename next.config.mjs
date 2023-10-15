@@ -18,7 +18,6 @@ const config = {
   images: {
     domains: ['cdn.discordapp.com'],
   },
-  output: 'standalone',
 };
 
 export default config;

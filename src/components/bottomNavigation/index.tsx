@@ -9,13 +9,14 @@ import ToolTip from '../toolTip';
 import Link from 'next/link';
 import { useState } from 'react';
 import { type _count } from '~/types/post/index.';
-import { type Favorite } from '@prisma/client';
+import { type Favorite } from '~/types/post/index.';
 interface likes {
   id:string,
   postId:string,
   userId:string,
   likedAt:Date
 }
+
 interface Comment {
   id:string,
   postId:string,

@@ -7,7 +7,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useState } from 'react';
 import { type _count } from '~/types/post/index.';
-import { type User, type Favorite, type Like, type Tag } from '@prisma/client';
+import { type User, type Favorite, type Like, type Tag } from '~/types/post/index.';
 
 interface Props {
   title: string;
@@ -19,7 +19,7 @@ interface Props {
   user?: User;
   like?: Like[];
   comment?: Comment[];
-  favorite?: Favorite[];
+  favorite?: Favorite[] | undefined;
   _count?: _count;
 }
 

@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build": "next build",
+    "build": "SKIP_ENV_VALIDATION=1 node --max-old-space-size=4096 node_modules/next/dist/bin/next build ",
     "db:push": "prisma db push",
     "dev": "next dev",
     "postinstall": "prisma generate",
