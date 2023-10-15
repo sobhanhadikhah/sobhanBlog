@@ -5,17 +5,22 @@ import Link from 'next/link';
 import { useState, useRef } from 'react';
 import { useOutsideClick } from '~/hook/useOutsideClick';
 import { AnimatePresence, motion } from 'framer-motion';
+import { useRouter } from 'next/router';
 function Navbar() {
   const { data: sessionData, status } = useSession();
   const Profile = sessionData?.user.image;
   const [toggle, setToggle] = useState(false);
-
+  const { push } = useRouter();
   const sidebarRef = useRef(null);
 
   // Close the sidebar when clicking outside of it
   useOutsideClick(sidebarRef, () => {
     setToggle(false);
   });
+  async function handleSignOut() {
+    await push('/');
+    await signOut();
+  }
 
   return (
     <nav className="sticky top-0 !z-[500] mx-auto   border-b border-black bg-[#171717] ">
@@ -67,7 +72,10 @@ function Navbar() {
                         Saved
                       </Link>
                       <div className="border-b" />
-                      <button type="button" onClick={() => void signOut()} className="text-red-500">
+                      <button
+                        type="button"
+                        onClick={() => void handleSignOut()}
+                        className="text-red-500">
                         Sign Out
                       </button>
                     </div>

@@ -97,8 +97,8 @@ export default function Home() {
                   <Link
                     href={`/t/${item.id}`}
                     key={item.id}
-                    className="justify between flex w-full rounded-md p-1 px-3 text-gray-100  transition-all duration-150 hover:bg-[#1f1f1f]">
-                    {item.label} <span>{item._count.posts}</span>
+                    className="flex w-full justify-between gap-3 rounded-md p-1 px-3 text-gray-100  transition-all duration-150 hover:bg-[#1f1f1f]">
+                    <span>{item.label}</span> <span>{item._count.posts}</span>
                   </Link>
                 ))}
           </div>
