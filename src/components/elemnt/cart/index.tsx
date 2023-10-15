@@ -1,8 +1,7 @@
 import { type NextPage } from 'next';
 import format from 'date-fns/format';
 import { api } from '~/utils/api';
-import toast from 'react-hot-toast';
-import { TrashSimple, Spinner, BookmarkSimple, Heart, Chat } from '@phosphor-icons/react';
+import { BookmarkSimple, Heart, Chat } from '@phosphor-icons/react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState } from 'react';
@@ -23,19 +22,11 @@ interface Props {
   _count?: _count;
 }
 
-const Cart: NextPage<Props> = ({ title, id, createdAt, tags, refetch, user, favorite, _count }) => {
+const Cart: NextPage<Props> = ({ title, id, createdAt, tags, user, favorite, _count }) => {
   const [isSaved, setIsSaved] = useState(!!favorite?.length);
   // Format the date as "MonthName Day, Year"
   const formattedDate = format(createdAt, 'MMMM dd, yyyy');
-  const { mutate, isLoading: isLoadingRemove } = api.post.deleteProduct.useMutation({
-    onSuccess() {
-      refetch();
-      toast.success('Ok!', { id: 'postDe' });
-    },
-    onError() {
-      toast.error(`error`, { id: 'postDe' });
-    },
-  });
+
   const { isLoading: isLoadingFavorite, mutate: mutateFavorite } = api.post.setFavorite.useMutation(
     {
       onError() {
@@ -43,10 +34,7 @@ const Cart: NextPage<Props> = ({ title, id, createdAt, tags, refetch, user, favo
       },
     },
   );
-  function deletePostHandle() {
-    toast.loading('removing', { id: 'postDe' });
-    mutate({ id });
-  }
+
   function handleSetFavorite() {
     mutateFavorite({ postId: id });
   }
@@ -82,15 +70,6 @@ const Cart: NextPage<Props> = ({ title, id, createdAt, tags, refetch, user, favo
               className="text-xl font-bold  capitalize text-white hover:text-sky-200 md:text-3xl ">
               {title}
             </Link>
-            <button disabled={isLoadingRemove} type="button" onClick={deletePostHandle}>
-              {isLoadingRemove ? (
-                <div className="animate-spin">
-                  <Spinner size={36} />
-                </div>
-              ) : (
-                <TrashSimple size={26} className="text-red-400" />
-              )}
-            </button>
           </div>
           {/* Tags */}
           <div className="mt-3 flex flex-wrap gap-3  text-sm">
