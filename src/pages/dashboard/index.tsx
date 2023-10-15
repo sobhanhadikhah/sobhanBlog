@@ -3,14 +3,14 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
 /* eslint-disable prettier/prettier */
 import { useState,  } from 'react';
-import Button from '~/components/elemnt/button';
-import { api } from '~/utils/api';
+//import Button from '~/components/elemnt/button';
+//import { api } from '~/utils/api';
 
 /* eslint-disable prettier/prettier */
 function Dashboard() {
   const [formData, setFormData] = useState({ value: '', label: '' });
-  const  {mutate} = api.category.createCategory.useMutation();
-  const  {mutate:deleteCategory} = api.category.deleteCategory.useMutation({
+//  const  {mutate} = api.category.createCategory.useMutation();
+  /* const  {mutate:deleteCategory} = api.category.deleteCategory.useMutation({
    onSuccess(){
       refetch();
     }
@@ -23,7 +23,7 @@ function Dashboard() {
       });
       
     
-  }
+  } */
   
   return (
     <div>
@@ -38,17 +38,17 @@ function Dashboard() {
         <input onChange={(e) =>
             setFormData({ ...formData, label: e.target.value })
           } type="text" name="label" value={formData.label} placeholder="label" />
-        <Button onClick={onHandle} type='submit' className='text-white bg-red-600'  >
+       {/*  <Button onClick={onHandle} type='submit' className='text-white bg-red-600'  >
           send
-        </Button>
+        </Button> */}
       </div>
       <div className='flex flex-col'  >
         <h3 className='text-3xl' >
           category
         </h3>
-          {
+          {/* {
             data?.categories.map((item)=> <button type='button' onClick={()=> void deleteCategory({id:item.id})}  key={item.id} > {item.label} </button>)
-          }
+          } */}
       </div>
   </div>
   )
