@@ -13,6 +13,7 @@ import 'md-editor-rt/lib/style.css';
 
 import { useRouter } from 'next/router';
 import Button from '~/components/elemnt/button';
+import { signIn, useSession } from 'next-auth/react';
 interface Post {
   title: string;
   content: string;
@@ -27,6 +28,7 @@ interface Option {
 
 function CreatePost() {
   const router = useRouter();
+  const { status } = useSession();
   const { data: categoryData } = api.category.getCategory.useQuery();
   const { mutate: createPost, isLoading: isLoadingCreatePost } = api.post.createPost.useMutation({
     onSuccess() {
@@ -74,9 +76,15 @@ function CreatePost() {
         image: '',
       });
     }
-    // After successfully creating the post, you can reset the form or perform any other necessary actions.
     setValue({ title: '', content: '' });
   };
+  if (status === 'loading') {
+    return <p>Loading...</p>;
+  }
+
+  if (status === 'unauthenticated') {
+    signIn();
+  }
 
   return (
     <div className=" mt-5  w-full !overflow-hidden  ">

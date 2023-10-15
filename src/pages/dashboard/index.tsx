@@ -2,6 +2,7 @@
 // eslint-disable-next-line prettier/prettier
 /* eslint-disable @typescript-eslint/no-floating-promises */
 /* eslint-disable prettier/prettier */
+import { signIn, useSession } from 'next-auth/react';
 import { useState,  } from 'react';
 //import Button from '~/components/elemnt/button';
 //import { api } from '~/utils/api';
@@ -9,6 +10,7 @@ import { useState,  } from 'react';
 /* eslint-disable prettier/prettier */
 function Dashboard() {
   const [formData, setFormData] = useState({ value: '', label: '' });
+  const {status} = useSession();
 //  const  {mutate} = api.category.createCategory.useMutation();
   /* const  {mutate:deleteCategory} = api.category.deleteCategory.useMutation({
    onSuccess(){
@@ -24,6 +26,13 @@ function Dashboard() {
       
     
   } */
+  if (status === 'loading') {
+    return <p>Loading...</p>;
+  }
+
+  if (status === 'unauthenticated') {
+    signIn();
+  }
   
   return (
     <div>
