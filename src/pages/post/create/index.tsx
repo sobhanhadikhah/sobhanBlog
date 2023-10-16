@@ -78,13 +78,13 @@ function CreatePost() {
     }
     setValue({ title: '', content: '' });
   };
-  /* if (status === 'loading') {
+  if (status === 'loading') {
     return <p>Loading...</p>;
   }
 
   if (status === 'unauthenticated') {
     signIn();
-  } */
+  }
 
   return (
     <div className=" mt-5  w-full !overflow-hidden  ">
@@ -111,11 +111,26 @@ function CreatePost() {
               isLoading={createTagLoading || tagsLoading}
               options={categoryData?.categories}
             /> */}
+            <CreatableSelect
+              isOptionDisabled={(tag, AllTags) => (AllTags?.length > 3 ? true : false)}
+              placeholder="Create or Select Tags"
+              isMulti
+              className="z-[610] col-span-12 w-full bg-black text-black   "
+              isClearable
+              isDisabled={createTagLoading}
+              isLoading={createTagLoading || tagsLoading}
+              onChange={(newValue) => {
+                setValueSelect(newValue);
+              }}
+              onCreateOption={handleCreate}
+              options={tagsData}
+              value={valueSelect}
+            />
 
             {/* Content */}
             <MdEditor
               style={{
-                zIndex: 100000000000,
+                zIndex: 600,
                 color: 'white',
                 height: 'calc(100vh - 322px)',
               }}
@@ -129,20 +144,6 @@ function CreatePost() {
               className="col-span-12 w-full"
               modelValue={value.content}
               onChange={(e) => setValue((prev) => ({ ...prev, content: e }))}
-            />
-            <CreatableSelect
-              placeholder="Create or Select Tags"
-              isMulti
-              className="z-[610] col-span-12 w-full bg-black text-black   "
-              isClearable
-              isDisabled={createTagLoading}
-              isLoading={createTagLoading || tagsLoading}
-              onChange={(newValue) => {
-                setValueSelect(newValue);
-              }}
-              onCreateOption={handleCreate}
-              options={tagsData}
-              value={valueSelect}
             />
 
             <div>

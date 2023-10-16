@@ -40,7 +40,7 @@ const Cart: NextPage<Props> = ({ title, id, createdAt, tags, user, favorite, _co
   }
 
   return (
-    <div className="z-50 col-span-12 h-full rounded-none bg-[#171717] md:rounded-md  ">
+    <div className="z-50 col-span-12 h-full rounded-none bg-[#171717] ring-sky-500 hover:ring-2 md:rounded-md md:ring-0 ">
       <div
         key={id}
         className="z-50  mb-auto flex h-full flex-col justify-between gap-3 rounded-lg bg-transparent  p-5   ">
