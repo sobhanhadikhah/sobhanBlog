@@ -2,7 +2,7 @@
 .sky {
   position: relative;
   width: 100%;
-  height: calc(100vh - 65px);
+  height: calc(100vh);
   background: black;
   overflow: auto;
   z-index: 0 !important ; /* Set the z-index for the sky container */

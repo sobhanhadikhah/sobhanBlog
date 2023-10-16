@@ -78,7 +78,7 @@ export default function Home() {
       <div className="grid grid-cols-12 gap-3 rounded-sm ">
         {/* tags */}
         <div className="col-span-3 hidden flex-col md:flex ">
-          <div className="z-[500] flex max-h-[800px] min-h-[400px] flex-col  gap-3 overflow-auto bg-black p-3 ">
+          <div className="z-[300] flex max-h-[800px] min-h-[400px] flex-col  gap-3 overflow-auto bg-black p-3 ">
             <div>
               <h2 className="text-lg font-semibold">Tags</h2>
             </div>

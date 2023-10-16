@@ -54,7 +54,7 @@ const PostInfo: NextPage = () => {
     }
   }
   return (
-    <div className="mx-auto max-w-3xl pt-3  ">
+    <div style={{ scrollBehavior: 'smooth' }} className="mx-auto max-w-3xl pt-3  ">
       <main>
         <div className="!z-[50] bg-black  px-3  md:rounded-md  ">
           <div className="flex items-center gap-2  ">
