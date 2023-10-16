@@ -54,7 +54,7 @@ const PostInfo: NextPage = () => {
     }
   }
   return (
-    <div>
+    <div className="mx-auto max-w-3xl pt-3  ">
       <main>
         <div className="!z-[50] bg-black  px-3  md:rounded-md  ">
           <div className="flex items-center gap-2  ">
@@ -84,7 +84,7 @@ const PostInfo: NextPage = () => {
           {/* tags */}
         </div>
         {/* content */}
-        <div className=" pb-10 ">
+        <div className=" h-[100vh] pb-10 ">
           <div className=" flex gap-3 bg-black px-3 pt-3 ">
             {data.post?.tags.map((item) => (
               <Link href={`/t/${item.id}`} key={item.id}>

@@ -5,7 +5,7 @@
 import { useState } from 'react';
 import { api } from '~/utils/api';
 import CreatableSelect from 'react-select/creatable';
-import Select from 'react-select';
+//import Select from 'react-select';
 import { type MultiValue } from 'react-select';
 import toast from 'react-hot-toast';
 import { MdEditor } from 'md-editor-rt';
@@ -29,7 +29,7 @@ interface Option {
 function CreatePost() {
   const router = useRouter();
   const { status } = useSession();
-  const { data: categoryData } = api.category.getCategory.useQuery();
+  // const { data: categoryData } = api.category.getCategory.useQuery();
   const { mutate: createPost, isLoading: isLoadingCreatePost } = api.post.createPost.useMutation({
     onSuccess() {
       toast.success('Ok', { id: 'post' });
@@ -78,13 +78,13 @@ function CreatePost() {
     }
     setValue({ title: '', content: '' });
   };
-  if (status === 'loading') {
+  /* if (status === 'loading') {
     return <p>Loading...</p>;
   }
 
   if (status === 'unauthenticated') {
     signIn();
-  }
+  } */
 
   return (
     <div className=" mt-5  w-full !overflow-hidden  ">
@@ -101,21 +101,8 @@ function CreatePost() {
               name="title"
               placeholder="Your Title is here"
             />
-            <CreatableSelect
-              placeholder="Create or Select Tags"
-              isMulti
-              className="z-[610] col-span-12 w-full bg-black text-black md:col-span-6  "
-              isClearable
-              isDisabled={createTagLoading}
-              isLoading={createTagLoading || tagsLoading}
-              onChange={(newValue) => {
-                setValueSelect(newValue);
-              }}
-              onCreateOption={handleCreate}
-              options={tagsData}
-              value={valueSelect}
-            />
-            <Select
+
+            {/* <Select
               isSearchable
               placeholder="select category  "
               isMulti
@@ -123,11 +110,15 @@ function CreatePost() {
               isDisabled={createTagLoading}
               isLoading={createTagLoading || tagsLoading}
               options={categoryData?.categories}
-            />
+            /> */}
 
             {/* Content */}
             <MdEditor
-              style={{ zIndex: 500, color: 'white', height: 'calc(100vh - 322px)' }}
+              style={{
+                zIndex: 100000000000,
+                color: 'white',
+                height: 'calc(100vh - 322px)',
+              }}
               theme="dark"
               preview={false}
               showToolbarName
@@ -138,6 +129,20 @@ function CreatePost() {
               className="col-span-12 w-full"
               modelValue={value.content}
               onChange={(e) => setValue((prev) => ({ ...prev, content: e }))}
+            />
+            <CreatableSelect
+              placeholder="Create or Select Tags"
+              isMulti
+              className="z-[610] col-span-12 w-full bg-black text-black   "
+              isClearable
+              isDisabled={createTagLoading}
+              isLoading={createTagLoading || tagsLoading}
+              onChange={(newValue) => {
+                setValueSelect(newValue);
+              }}
+              onCreateOption={handleCreate}
+              options={tagsData}
+              value={valueSelect}
             />
 
             <div>

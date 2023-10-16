@@ -5,12 +5,13 @@
 import Head from 'next/head';
 import Cart from '~/components/elemnt/cart';
 import { api } from '~/utils/api';
-import { useState } from 'react';
+import { type ReactNode, useState } from 'react';
 import { type Post } from '~/types/post/index.';
 import { useInView } from 'react-intersection-observer';
 import 'react-loading-skeleton/dist/skeleton.css';
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import Link from 'next/link';
+import MainLayout from '~/components/layouts/main';
 
 export default function Home() {
   const { ref } = useInView({
@@ -175,3 +176,6 @@ export default function Home() {
     </>
   );
 }
+Home.getLayout = function getLayout(page: ReactNode) {
+  return <MainLayout>{page}</MainLayout>;
+};
