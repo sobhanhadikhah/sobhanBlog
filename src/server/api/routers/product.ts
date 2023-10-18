@@ -174,13 +174,15 @@ export const productRouter = createTRPCRouter({
       }
     }),
   isUserLike: protectedProcedure
-    .input(z.object({ userId: z.string(), postId: z.string() }))
+    .input(z.object({ postId: z.string() }))
     .query(async ({ ctx, input }) => {
       try {
+        const userID = ctx.session.user.id;
         const like = await ctx.db.like.findFirst({
-          where: { userId: input.userId, postId: input.postId },
+          where: { userId: userID, postId: input.postId },
         });
         return {
+          like,
           isLike: !!like,
           status: 200,
           success: true,

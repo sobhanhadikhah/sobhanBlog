@@ -49,13 +49,13 @@ const BottomNavigation: NextPage<Props> = ({userId,postId,refetchPost,_count,fav
       setLikeCount((prev)=>(prev-1))
     }
   }) ;
-  const {refetch} = api.post.isUserLike.useQuery({userId:userId,postId:postId},{
+  const {refetch,data} = api.post.isUserLike.useQuery({postId:postId},{
     onSuccess(data){
       if (data?.isLike) {
         setIsLike(data?.isLike)
       }
     }
-  }); 
+  });
   function handleLike(postId:string, userId:string) {
     if (isLike) {
       setLikeCount((prev) => prev - 1);
