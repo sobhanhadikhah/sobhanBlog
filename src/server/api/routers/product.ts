@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/await-thenable */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
@@ -132,29 +133,37 @@ export const productRouter = createTRPCRouter({
     .input(z.object({ userId: z.string(), postId: z.string() }))
     .mutation(async ({ ctx, input }) => {
       try {
-        const post = await ctx.db.like.findFirst({
-          where: { userId: input.userId, postId: input.postId },
+        const userID = await ctx.session.user.id;
+        const existingLike = await ctx.db.like.findFirst({
+          where: { userId: userID, postId: input.postId },
         });
-        if (post) {
+
+        if (existingLike) {
+          // The user has already liked the post; let's remove the like.
           await ctx.db.like.delete({
-            where: { userId: input.userId, postId: input.postId, id: post.id },
+            where: { id: existingLike.id },
           });
         } else {
+          // The user has not liked the post; let's create a new like record.
           await ctx.db.like.create({
             data: { userId: input.userId, postId: input.postId },
           });
         }
+
         return {
           status: 200,
           success: true,
         };
       } catch (error) {
+        console.error('Error in likePost route:', error);
         return {
           status: 500,
-          success: true,
+          success: false,
+          error: 'An error occurred while processing the like action.',
         };
       }
     }),
+
   createCategory: protectedProcedure
     .input(z.object({ label: z.string(), value: z.string() }))
     .mutation(async ({ ctx, input }) => {
@@ -174,21 +183,31 @@ export const productRouter = createTRPCRouter({
       }
     }),
   isUserLike: protectedProcedure
-    .input(z.object({ postId: z.string() }))
+    .input(z.object({ postId: z.string(), userId: z.string() }))
     .query(async ({ ctx, input }) => {
       try {
-        const userID = ctx.session.user.id;
         const like = await ctx.db.like.findFirst({
-          where: { userId: userID, postId: input.postId },
+          where: { userId: input.userId, postId: input.postId },
         });
+
         return {
           like,
           isLike: !!like,
           status: 200,
           success: true,
         };
-      } catch (error) {}
+      } catch (error) {
+        // Handle errors appropriately, e.g., log the error
+        console.error('Error in isUserLike route:', error);
+
+        return {
+          isLike: false,
+          status: 500, // Internal Server Error
+          success: false,
+        };
+      }
     }),
+
   createComment: protectedProcedure
     .input(z.object({ userId: z.string(), postId: z.string(), text: z.string() }))
     .mutation(async ({ ctx, input }) => {
