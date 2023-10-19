@@ -10,6 +10,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { type _count } from '~/types/post/index.';
 import { type Favorite } from '~/types/post/index.';
+import { useSession } from 'next-auth/react';
 interface likes {
   id:string,
   postId:string,
@@ -36,6 +37,7 @@ type Props ={
 }
 const BottomNavigation: NextPage<Props> = ({userId,postId,refetchPost,_count,favorite}) => {
   const [isLike, setIsLike] = useState(false);
+  const {data:userData} = useSession();
   const [likeCount, setLikeCount] = useState(_count?.like ?? 0)
   const [isSaved, setIsSaved] = useState(!!favorite?.length);
   const Like = api.post.likePost.useMutation({
@@ -49,21 +51,22 @@ const BottomNavigation: NextPage<Props> = ({userId,postId,refetchPost,_count,fav
       setLikeCount((prev)=>(prev-1))
     }
   }) ;
-  const {refetch,data} = api.post.isUserLike.useQuery({postId:postId,userId:userId},{
+  const {refetch,data} = api.post.isUserLike.useQuery({postId:postId,userId:userData?.user.id ?? ""},{
     onSuccess(data){
       if (data?.isLike) {
         setIsLike(data?.isLike)
       }
     }
   });
-  function handleLike(postId:string, userId:string) {
+  function handleLike(postId:string) {
     if (isLike) {
       setLikeCount((prev) => prev - 1);
     } else {
       setLikeCount((prev) => prev + 1);
     }
-    Like.mutate({ userId: userId, postId: postId });
+    Like.mutate({ userId: userData?.user.id ?? "", postId: postId });
   }
+  /* favorite section */
   const { isLoading: isLoadingFavorite, mutate: mutateFavorite } = api.post.setFavorite.useMutation(
     {
       onError() {
@@ -87,7 +90,7 @@ const BottomNavigation: NextPage<Props> = ({userId,postId,refetchPost,_count,fav
     <button type='button' disabled={Like.isLoading} className='flex gap-2'
      onClick={()=>{
       setIsLike((prev)=>(!prev))
-      handleLike(postId,userId)}
+      handleLike(postId)}
       } >
      {likeCount} <Heart color='red' size={28} weight={isLike ? "fill" : "regular"}  />
     </button>

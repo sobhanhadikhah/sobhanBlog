@@ -140,7 +140,7 @@ export const productRouter = createTRPCRouter({
         if (existingLike) {
           // The user has already liked the post; let's remove the like.
           await ctx.db.like.delete({
-            where: { id: existingLike.id },
+            where: { id: existingLike.id, postId: existingLike.postId },
           });
         } else {
           // The user has not liked the post; let's create a new like record.
@@ -182,11 +182,13 @@ export const productRouter = createTRPCRouter({
       }
     }),
   isUserLike: protectedProcedure
-    .input(z.object({ postId: z.string(), userId: z.string() }))
+    .input(z.object({ postId: z.string() }))
     .query(async ({ ctx, input }) => {
       try {
+        const userId = await ctx.session.user.id;
+        console.log('userid', userId);
         const like = await ctx.db.like.findFirst({
-          where: { userId: input.userId, postId: input.postId },
+          where: { userId: userId, postId: input.postId },
         });
 
         return {
