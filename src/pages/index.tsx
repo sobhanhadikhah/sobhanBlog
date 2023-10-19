@@ -175,7 +175,7 @@ export default function Home() {
           ) : null}
         </main>
         {/* banner */}
-        <div className="col-span-2 hidden md:flex">banner</div>
+        <div className="col-span-2 hidden md:flex">banner is here</div>
       </div>
     </>
   );
