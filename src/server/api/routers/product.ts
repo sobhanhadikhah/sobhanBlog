@@ -249,6 +249,36 @@ export const productRouter = createTRPCRouter({
         };
       } catch (error) {}
     }),
+  getFavorite: protectedProcedure
+    .input(z.object({ limit: z.number() }))
+    .query(async ({ ctx, input }) => {
+      try {
+        const data = await ctx.db.favorite.findMany({
+          take: input.limit,
+          where: { userId: ctx.session.user.id },
+          include: {
+            post: {
+              include: {
+                user: true,
+                _count: {
+                  select: {
+                    like: true,
+                    comment: true,
+                    favorite: true,
+                  },
+                },
+              },
+            },
+            user: true,
+          },
+        });
+        return {
+          status: 200,
+          data,
+          success: true,
+        };
+      } catch (error) {}
+    }),
 
   byId: publicProcedure.input(z.object({ id: z.string() })).query(async ({ input, ctx }) => {
     return {

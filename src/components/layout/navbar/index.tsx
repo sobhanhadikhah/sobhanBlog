@@ -69,7 +69,7 @@ function Navbar() {
                         Create Post
                       </Link>
                       <Link onClick={() => setToggle(false)} href={'/saved'}>
-                        Saved
+                        Reading list
                       </Link>
                       <div className="border-b" />
                       <button

@@ -42,7 +42,11 @@ function CreatePost() {
     refetch: refetchTags,
     isLoading: tagsLoading,
   } = api.tag.getAllTag.useQuery();
-  const { mutate: createTag, isLoading: createTagLoading } = api.tag.createTag.useMutation({
+  const {
+    mutate: createTag,
+    isLoading: createTagLoading,
+    isSuccess,
+  } = api.tag.createTag.useMutation({
     onSuccess() {
       refetchTags();
     },
@@ -57,6 +61,13 @@ function CreatePost() {
 
   const handleCreate = (inputValue: string) => {
     createTag({ label: inputValue, value: inputValue });
+    // After a successful tag creation, update the valueSelect state
+    if (isSuccess) {
+    }
+    setValueSelect((prevValueSelect) => [
+      ...(prevValueSelect || []),
+      { label: inputValue, value: inputValue, id: inputValue },
+    ]);
   };
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
