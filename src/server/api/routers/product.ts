@@ -133,9 +133,8 @@ export const productRouter = createTRPCRouter({
     .input(z.object({ userId: z.string(), postId: z.string() }))
     .mutation(async ({ ctx, input }) => {
       try {
-        const userID = await ctx.session.user.id;
         const existingLike = await ctx.db.like.findFirst({
-          where: { userId: userID, postId: input.postId },
+          where: { userId: input.userId, postId: input.postId },
         });
 
         if (existingLike) {
