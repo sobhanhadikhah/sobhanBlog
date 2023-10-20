@@ -12,8 +12,12 @@ import 'react-loading-skeleton/dist/skeleton.css';
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import Link from 'next/link';
 import MainLayout from '~/components/layouts/main';
+import MyModal from '~/components/modal';
+import { useSession } from 'next-auth/react';
 
 export default function Home() {
+  const { status: sessionStatus } = useSession();
+  const unAuthorized = sessionStatus === 'unauthenticated';
   const { ref } = useInView({
     onChange(inView) {
       if (inView && page < totalPage - 1) {
@@ -25,6 +29,7 @@ export default function Home() {
   const [sort, setSort] = useState('');
   const [page, setPage] = useState(0);
   const [totalPage, setTotalPage] = useState(0);
+  
   const { refetch, isLoading, fetchNextPage, isInitialLoading, data } =
     api.post.getAll.useInfiniteQuery(
       {
@@ -87,6 +92,7 @@ export default function Home() {
           content="cxcDaYiPO_9_2-UFokX7gIdlD1v6BBBsV2mMxA8yL2I"
         />
       </Head>
+      {unAuthorized ? <MyModal /> : null}
 
       <div className="grid grid-cols-12 gap-3 rounded-sm ">
         {/* tags */}

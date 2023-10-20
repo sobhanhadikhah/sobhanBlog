@@ -19,6 +19,8 @@ import Link from 'next/link';
 import Loading from '~/components/elemnt/loading';
 const PostInfo: NextPage = () => {
   const { query } = useRouter();
+  const { status: sessionStatus } = useSession();
+  const unAuthorized = sessionStatus === 'unauthenticated';
   const [value, setValue] = useState('');
   const { data: userData } = useSession();
   // Ensure that query.id is a string or provide a default value if it's undefined
@@ -104,55 +106,57 @@ const PostInfo: NextPage = () => {
         </div>
         {/* comment */}
         <div className=" border-b border-gray-500 " />
-        <div className="mx-3 pb-40 pt-10 ">
-          <div className="flex flex-col gap-5  ">
-            <div id="commentSection" className="flex items-center gap-3 ">
-              <h2 className="text-3xl">Top comments ({data.post?.comment.length})</h2>
+        {!unAuthorized ? (
+          <div className="mx-3 pb-40 pt-10 ">
+            <div className="flex flex-col gap-5  ">
+              <div id="commentSection" className="flex items-center gap-3 ">
+                <h2 className="text-3xl">Top comments ({data.post?.comment.length})</h2>
+              </div>
+              <textarea
+                placeholder="Add to the discussion"
+                value={value}
+                onChange={(e) => setValue(e.target.value)}
+                name="comment"
+                className="rounded-md border-none bg-[#171717] p-5 text-white focus:outline-none "
+              />
+              <div>
+                <button
+                  disabled={isLoadingComment || !value}
+                  onClick={() => void handleComment(id, value, userData?.user.id)}
+                  className="rounded-md  bg-sky-400 px-3 py-2 ">
+                  Submit
+                </button>
+              </div>
             </div>
-            <textarea
-              placeholder="Add to the discussion"
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
-              name="comment"
-              className="rounded-md border-none bg-[#171717] p-5 text-white focus:outline-none "
-            />
-            <div>
-              <button
-                disabled={isLoadingComment || !value}
-                onClick={() => void handleComment(id, value, userData?.user.id)}
-                className="rounded-md  bg-sky-400 px-3 py-2 ">
-                Submit
-              </button>
-            </div>
-          </div>
 
-          <div className="flex flex-col gap-5 pt-10 font-mono ">
-            {data.post?.comment.map((item) => (
-              <div key={item.id} className="grid grid-cols-12 gap-1 ">
-                <div className="col-span-1 flex items-center gap-3  ">
-                  <span>
-                    <Image
-                      src={item?.user?.image ?? ''}
-                      alt="profile"
-                      width={32}
-                      height={32}
-                      className="rounded-full"
-                    />
-                  </span>
-                </div>
-                <div className="col-span-10 flex flex-col  rounded-lg border border-gray-600 p-2 text-lg">
-                  <div className="flex items-center gap-2  pb-3  ">
-                    <span className="text-base font-semibold">{item.user.name}</span>
-                    <span className="text-gray-300">
-                      {item.commentAt ? format(item.commentAt, 'MMM dd, yy') : null}
+            <div className="flex flex-col gap-5 pt-10 font-mono ">
+              {data.post?.comment.map((item) => (
+                <div key={item.id} className="grid grid-cols-12 gap-1 ">
+                  <div className="col-span-1 flex items-center gap-3  ">
+                    <span>
+                      <Image
+                        src={item?.user?.image ?? ''}
+                        alt="profile"
+                        width={32}
+                        height={32}
+                        className="rounded-full"
+                      />
                     </span>
                   </div>
-                  {item.text}
+                  <div className="col-span-10 flex flex-col  rounded-lg border border-gray-600 p-2 text-lg">
+                    <div className="flex items-center gap-2  pb-3  ">
+                      <span className="text-base font-semibold">{item.user.name}</span>
+                      <span className="text-gray-300">
+                        {item.commentAt ? format(item.commentAt, 'MMM dd, yy') : null}
+                      </span>
+                    </div>
+                    {item.text}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
+        ) : null}
       </main>
       {/* bottom navigation */}
       <BottomNavigation

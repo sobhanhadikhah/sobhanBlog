@@ -11,6 +11,7 @@ import { useState } from 'react';
 import { type _count } from '~/types/post/index.';
 import { type Favorite } from '~/types/post/index.';
 import { useSession } from 'next-auth/react';
+import MyModal from '../modal';
 interface likes {
   id:string,
   postId:string,
@@ -37,7 +38,9 @@ type Props ={
 }
 const BottomNavigation: NextPage<Props> = ({postId,refetchPost,_count,favorite}) => {
   const [isLike, setIsLike] = useState(false);
-  const {data:userData} = useSession();
+  const {data:userData,status:sessionStatus} = useSession();
+  const [showModal,setShowModal] = useState(false);
+  const unAuthorized = sessionStatus === 'unauthenticated';
   const [likeCount, setLikeCount] = useState(_count?.like ?? 0)
   const [isSaved, setIsSaved] = useState(!!favorite?.length);
   const Like = api.post.likePost.useMutation({
@@ -78,17 +81,30 @@ const BottomNavigation: NextPage<Props> = ({postId,refetchPost,_count,favorite})
     },
   );
   function handleSetFavorite() {
+    if (unAuthorized) {
+      setShowModal(true)
+      return;
+    }
+    setIsSaved((prev)=> (!prev));
     mutateFavorite({ postId });
   }
   
   return  (
     <>
+    {
+      showModal ? <MyModal setIsShowModal={setShowModal}  /> : null
+    }
   <div className="fixed md:bottom-12 bottom-0 md:max-w-2xl  mx-auto  !z-[90000] w-full md:left-10 md:right-10 block  md:rounded-full  bg-black  shadow-sm    ">
   <div className="  flex  w-full items-center  justify-around gap-5 p-3  ">
     
     <ToolTip content='like' >
     <button type='button' disabled={Like.isLoading} className='flex gap-2'
      onClick={()=>{
+      if (unAuthorized) {
+        setShowModal(true)
+        return;
+      }
+
       setIsLike((prev)=>(!prev))
       handleLike(postId)}
       } >
@@ -103,10 +119,7 @@ const BottomNavigation: NextPage<Props> = ({postId,refetchPost,_count,favorite})
       </ToolTip>
       <ToolTip content='Save' >
 
-    <button  disabled={isLoadingFavorite} onClick={()=>{
-      setIsSaved((prev)=> (!prev))
-      handleSetFavorite()
-    }}  type='button' className='flex items-center'  >
+    <button  disabled={isLoadingFavorite} onClick={handleSetFavorite}  type='button' className='flex items-center'  >
       {_count?.favorite}
     <BookmarkSimple size={36} weight={isSaved ? "fill" : "regular" }  />
     </button>

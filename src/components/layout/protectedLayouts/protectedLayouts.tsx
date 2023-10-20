@@ -4,6 +4,7 @@
 import { signIn, useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import { type ReactNode, useEffect } from 'react';
+import Loading from '~/components/elemnt/loading';
 
 type Props = {
   children: ReactNode;
@@ -35,7 +36,7 @@ export const ProtectedLayout = ({ children }: Props): JSX.Element => {
 
   // if the user refreshed the page or somehow navigated to the protected page
   if (loading) {
-    return <>Loading app...</>;
+    return <Loading/>;
   }
 
   // if the user is authorized, render the page
