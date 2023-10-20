@@ -3,12 +3,13 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
 /* eslint-disable prettier/prettier */
 import { signIn, useSession } from 'next-auth/react';
-import { useState,  } from 'react';
+import { type ReactNode, useState,  } from 'react';
+import { ProtectedLayout } from '~/components/layout/protectedLayouts/protectedLayouts';
 //import Button from '~/components/elemnt/button';
 //import { api } from '~/utils/api';
 
 /* eslint-disable prettier/prettier */
-function Dashboard() {
+export default function Dashboard() {
   const [formData, setFormData] = useState({ value: '', label: '' });
   const {status} = useSession();
 //  const  {mutate} = api.category.createCategory.useMutation();
@@ -62,4 +63,6 @@ function Dashboard() {
   </div>
   )
 }
-export default Dashboard;
+Dashboard.getLayout = function getLayout(page: ReactNode) {
+  return <ProtectedLayout>{page}</ProtectedLayout>;
+};

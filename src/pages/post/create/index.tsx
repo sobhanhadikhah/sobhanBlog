@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 /* eslint-disable @typescript-eslint/no-misused-promises */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { useState } from 'react';
+import { type ReactNode, useState } from 'react';
 import { api } from '~/utils/api';
 import CreatableSelect from 'react-select/creatable';
 //import Select from 'react-select';
@@ -14,6 +14,7 @@ import 'md-editor-rt/lib/style.css';
 import { useRouter } from 'next/router';
 import Button from '~/components/elemnt/button';
 import { signIn, useSession } from 'next-auth/react';
+import { ProtectedLayout } from '~/components/layout/protectedLayouts/protectedLayouts';
 interface Post {
   title: string;
   content: string;
@@ -26,7 +27,7 @@ interface Option {
   id: string;
 }
 
-function CreatePost() {
+export default function CreatePost() {
   const router = useRouter();
   const { status } = useSession();
   // const { data: categoryData } = api.category.getCategory.useQuery();
@@ -171,5 +172,6 @@ function CreatePost() {
     </div>
   );
 }
-
-export default CreatePost;
+CreatePost.getLayout = function getLayout(page: ReactNode) {
+  return <ProtectedLayout>{page}</ProtectedLayout>;
+};

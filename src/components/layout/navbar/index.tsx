@@ -8,6 +8,9 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useRouter } from 'next/router';
 function Navbar() {
   const { data: sessionData, status } = useSession();
+  const authorized = status === 'authenticated';
+  const unAuthorized = status === 'unauthenticated';
+  //  const loading = status === 'loading';
   const Profile = sessionData?.user.image;
   const [toggle, setToggle] = useState(false);
   const { push } = useRouter();
@@ -31,7 +34,7 @@ function Navbar() {
           </Link>
         </div>
         <div>
-          {status === 'authenticated' ? (
+          {authorized ? (
             <div className="flex items-center gap-3 ">
               <Link
                 className="hidden rounded-sm px-3 py-2 font-semibold ring-2 ring-white hover:bg-white hover:text-black md:flex "
@@ -84,7 +87,7 @@ function Navbar() {
               ) : null}
             </div>
           ) : null}
-          {status === 'unauthenticated' ? (
+          {unAuthorized ? (
             <button onClick={() => void signIn()} type="button">
               Log in
             </button>

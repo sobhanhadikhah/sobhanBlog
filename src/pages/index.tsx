@@ -21,38 +21,47 @@ export default function Home() {
       }
     },
   });
-  const [sort] = useState('');
+  /* ['post.getAll', { limit: 10, order: sort || undefined }], */
+  const [sort, setSort] = useState('');
   const [page, setPage] = useState(0);
-  const [posts, setPosts] = useState<Post[]>([]);
   const [totalPage, setTotalPage] = useState(0);
-  const { refetch, isLoading, fetchNextPage } = api.post.getAll.useInfiniteQuery(
-    {
-      limit: 10,
-      order: sort || undefined,
-    },
-    {
-      staleTime: 0,
-      refetchOnWindowFocus: false,
-      getNextPageParam: (lastPage, pages) => {
-        if (Math.ceil(lastPage.count / 10) > pages.length) return lastPage.nextCursor;
-        return undefined;
+  const { refetch, isLoading, fetchNextPage, isInitialLoading, data } =
+    api.post.getAll.useInfiniteQuery(
+      {
+        limit: 30,
+        order: sort || undefined,
       },
-      onSuccess(data) {
-        //@ts-ignore
-        setPosts((prev) => [...prev, ...data?.pages[page]?.posts]);
-        setTotalPage(data?.pages[page]?.totalPages ?? 0);
+      {
+        queryKey: ['post.getAll', { limit: 30, order: sort || undefined }],
+        refetchOnWindowFocus: false,
+        getNextPageParam: (lastPage, pages) => {
+          if (Math.ceil(lastPage.count / 30) > pages.length) return lastPage.nextCursor;
+          return undefined;
+        },
+        onSuccess(data) {
+          setTotalPage(data?.pages[page]?.totalPages ?? 0);
+        },
       },
-    },
-  );
+    );
+  //@ts-ignore
+  const posts: Post[] = data?.pages.reduce((acc, page) => {
+    return [...acc, ...page.posts];
+  }, []);
 
-  const handleFetchNextPage = async () => {
+  const handleFetchNextPage = () => {
     console.log('from fetch start', page);
     setPage((prev) => prev + 1);
-    await fetchNextPage();
+
+    // Define the query key for the new page
+
+    // Invalidate the cache for the next page
+
+    fetchNextPage();
+
     console.log('from fetch end', page);
   };
 
-  /* const sortButtons = [
+  const sortButtons = [
     {
       id: 'latestId',
       value: '',
@@ -63,7 +72,7 @@ export default function Home() {
       value: 'like',
       label: 'Top',
     },
-  ]; */
+  ];
 
   const { data: tagsData, isLoading: isLoadingTags } = api.tag.getAllTag.useQuery();
 
@@ -111,12 +120,11 @@ export default function Home() {
         <main className="col-span-12 grid grid-cols-12 items-start   gap-y-2 md:col-span-7">
           {/* sort */}
           <div className="col-span-12 flex    gap-5  px-3 py-3 text-2xl">
-            {/* {sortButtons.map((item) => (
+            {sortButtons.map((item) => (
               <button
                 key={item.id}
                 onClick={() => {
                   if (item.value !== sort) {
-                    setPosts([]);
                     setSort(item.value);
                     setPage(0);
                     console.log('from sort', page);
@@ -125,10 +133,10 @@ export default function Home() {
                 className={`${item.value === sort ? 'font-bold text-white' : 'text-white/75'}`}>
                 {item.label}
               </button>
-            ))} */}
+            ))}
           </div>
           {/* posts */}
-          {!isLoading
+          {!isInitialLoading
             ? posts.map((item) => <Cart refetch={refetch} key={item.id} {...item} />)
             : Array(6)
                 .fill('id')

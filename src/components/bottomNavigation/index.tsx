@@ -35,7 +35,7 @@ type Props ={
   favorite: Favorite[] | undefined
   
 }
-const BottomNavigation: NextPage<Props> = ({userId,postId,refetchPost,_count,favorite}) => {
+const BottomNavigation: NextPage<Props> = ({postId,refetchPost,_count,favorite}) => {
   const [isLike, setIsLike] = useState(false);
   const {data:userData} = useSession();
   const [likeCount, setLikeCount] = useState(_count?.like ?? 0)
@@ -51,7 +51,7 @@ const BottomNavigation: NextPage<Props> = ({userId,postId,refetchPost,_count,fav
       setLikeCount((prev)=>(prev-1))
     }
   }) ;
-  const {refetch,data} = api.post.isUserLike.useQuery({postId:postId,userId:userData?.user.id ?? ""},{
+  const {refetch} = api.post.isUserLike.useQuery({postId:postId},{
     onSuccess(data){
       if (data?.isLike) {
         setIsLike(data?.isLike)
