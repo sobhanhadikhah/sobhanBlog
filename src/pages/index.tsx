@@ -29,7 +29,7 @@ export default function Home() {
   const [sort, setSort] = useState('');
   const [page, setPage] = useState(0);
   const [totalPage, setTotalPage] = useState(0);
-  
+
   const { refetch, isLoading, fetchNextPage, isInitialLoading, data } =
     api.post.getAll.useInfiniteQuery(
       {
@@ -92,7 +92,7 @@ export default function Home() {
           content="cxcDaYiPO_9_2-UFokX7gIdlD1v6BBBsV2mMxA8yL2I"
         />
       </Head>
-      {unAuthorized ? <MyModal /> : null}
+      {/* {unAuthorized ? <MyModal /> : null} */}
 
       <div className="grid grid-cols-12 gap-3 rounded-sm ">
         {/* tags */}

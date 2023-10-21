@@ -14,7 +14,7 @@ interface Props {
   content: string;
   createdAt: Date;
   tags?: Tag[] | undefined;
-  refetch: CallableFunction;
+  refetch?: CallableFunction;
   user?: User;
   like?: Like[];
   comment?: Comment[];
@@ -44,24 +44,26 @@ const Cart: NextPage<Props> = ({ title, id, createdAt, tags, user, favorite, _co
       <div
         key={id}
         className="z-50  mb-auto flex h-full flex-col justify-between gap-3 rounded-lg bg-transparent  p-5   ">
-        <div>
-          {/* User info */}
-          <div className="align-center flex items-center gap-3">
-            {user?.image ? (
-              <Image
-                className="rounded-full"
-                src={user?.image}
-                alt="profile"
-                width={32}
-                height={32}
-              />
-            ) : null}
-            <div className="flex flex-col">
-              <span className="text-base font-semibold ">{user?.name}</span>
-              <span className="text-sm font-thin text-gray-300 ">{formattedDate}</span>
-            </div>
+        {user?.id ? (
+          <div>
+            {/* User info */}
+            <Link href={`/user/info/${user?.id}`} className="align-center flex items-center gap-3">
+              {user?.image ? (
+                <Image
+                  className="rounded-full"
+                  src={user?.image}
+                  alt="profile"
+                  width={32}
+                  height={32}
+                />
+              ) : null}
+              <div className="flex flex-col">
+                <span className="text-base font-semibold ">{user?.name}</span>
+                <span className="text-sm font-thin text-gray-300 ">{formattedDate}</span>
+              </div>
+            </Link>
           </div>
-        </div>
+        ) : null}
         <div className="ml-0 md:ml-10">
           {/* header */}
           <div className="flex items-center justify-between ">
