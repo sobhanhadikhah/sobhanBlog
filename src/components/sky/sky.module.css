@@ -3,9 +3,9 @@
   scroll-behavior: smooth;
   position: relative;
   width: 100%;
-  height: 100vh;
+  /* height: 100vh; */
   background: black;
-  overflow: auto;
+  overflow: visible;
   z-index: 0 !important ; /* Set the z-index for the sky container */
 }
 

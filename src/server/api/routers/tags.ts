@@ -64,12 +64,23 @@ export const tagsRouter = createTRPCRouter({
   }),
   getAllTag: publicProcedure.query(({ ctx }) => {
     return ctx.db.tag.findMany({
+      include: {
+        _count: {
+          select: {
+            posts: true,
+          },
+        },
+      },
+      where: {
+        posts: {
+          some: {},
+        },
+      },
       orderBy: {
         posts: {
           _count: 'desc',
         },
       },
-      include: { _count: { select: { posts: true } } },
     });
   }),
 });

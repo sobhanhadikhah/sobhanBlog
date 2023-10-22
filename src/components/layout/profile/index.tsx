@@ -6,12 +6,14 @@ interface Props {
     children:ReactNode
 }
 function ProfileLayout({children}:Props) {
-  return <div>
-    <div className='w-full p-3  z-50  mx-auto  bg-purple-800 ' >
+  return <>
+    <div className='w-full p-3 sticky top-0  overflow-hidden z-50  mx-auto  bg-purple-800 ' >
                 <h2 className='text-xl' >Profile</h2>     
             </div>
+            <div   className='overflow-hidden ' >
             {children}
-  </div>;
+            </div>
+  </>;
 }
 
 export default ProfileLayout;

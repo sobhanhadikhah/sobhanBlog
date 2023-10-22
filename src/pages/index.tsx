@@ -94,7 +94,7 @@ export default function Home() {
       </Head>
       {/* {unAuthorized ? <MyModal /> : null} */}
 
-      <div className="grid grid-cols-12 gap-3 rounded-sm ">
+      <div className="grid grid-cols-12 gap-3 overflow-hidden rounded-sm ">
         {/* tags */}
         <div className="col-span-3 hidden flex-col md:flex ">
           <div className="z-[300] flex max-h-[800px] min-h-[400px] flex-col  gap-3 overflow-auto bg-black p-3 ">
@@ -123,7 +123,7 @@ export default function Home() {
                 ))}
           </div>
         </div>
-        <main className="col-span-12 grid grid-cols-12 items-start   gap-y-2 md:col-span-7">
+        <div className="col-span-12 grid h-full grid-cols-12 items-start gap-y-2  overflow-auto md:col-span-7">
           {/* sort */}
           <div className="col-span-12 flex    gap-5  px-3 py-3 text-2xl">
             {sortButtons.map((item) => (
@@ -187,7 +187,7 @@ export default function Home() {
               ref={ref}
             />
           ) : null}
-        </main>
+        </div>
         {/* banner */}
         <div className="col-span-2 hidden md:flex">banner is here</div>
       </div>

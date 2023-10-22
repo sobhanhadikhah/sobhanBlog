@@ -6,7 +6,6 @@ import Cart from '~/components/elemnt/cart';
 import Loading from '~/components/elemnt/loading';
 import ProfileLayout from '~/components/layout/profile';
 import { api } from '~/utils/api';
-
 /* eslint-disable prettier/prettier */
 export default function UserInfo() {
     const {query} = useRouter();
@@ -16,7 +15,7 @@ export default function UserInfo() {
       return <Loading/>
     }
   return (
-    <div  >
+    <>
             <div className='flex items-center flex-col gap-5  justify-center mt-10 ' >
                 <Image src={data?.user?.image ?? ""}
                  alt='profile'
@@ -34,58 +33,12 @@ export default function UserInfo() {
             {/* i want render my cart here */}
             <div 
             style={{height:"calc(100vh - 323px)"}}
-            className='max-w-5xl p-3     w-full flex flex-col gap-3 rounded-lg mx-auto  overflow-auto ' >
+            className='max-w-5xl p-3 w-full flex flex-col gap-3 rounded-lg mx-auto  overflow-auto ' >
                   {
-                    data?.user?.posts.map((item)=> <Cart key={item.id} {...item} />)
-                  }{
-                    data?.user?.posts.map((item)=> <Cart key={item.id} {...item} />)
-                  }{
-                    data?.user?.posts.map((item)=> <Cart key={item.id} {...item} />)
-                  }{
-                    data?.user?.posts.map((item)=> <Cart key={item.id} {...item} />)
-                  }{
-                    data?.user?.posts.map((item)=> <Cart key={item.id} {...item} />)
-                  }{
-                    data?.user?.posts.map((item)=> <Cart key={item.id} {...item} />)
-                  }{
-                    data?.user?.posts.map((item)=> <Cart key={item.id} {...item} />)
-                  }{
-                    data?.user?.posts.map((item)=> <Cart key={item.id} {...item} />)
-                  }{
-                    data?.user?.posts.map((item)=> <Cart key={item.id} {...item} />)
-                  }{
-                    data?.user?.posts.map((item)=> <Cart key={item.id} {...item} />)
-                  }{
-                    data?.user?.posts.map((item)=> <Cart key={item.id} {...item} />)
-                  }{
-                    data?.user?.posts.map((item)=> <Cart key={item.id} {...item} />)
-                  }{
-                    data?.user?.posts.map((item)=> <Cart key={item.id} {...item} />)
-                  }{
-                    data?.user?.posts.map((item)=> <Cart key={item.id} {...item} />)
-                  }{
-                    data?.user?.posts.map((item)=> <Cart key={item.id} {...item} />)
-                  }{
-                    data?.user?.posts.map((item)=> <Cart key={item.id} {...item} />)
-                  }{
-                    data?.user?.posts.map((item)=> <Cart key={item.id} {...item} />)
-                  }{
-                    data?.user?.posts.map((item)=> <Cart key={item.id} {...item} />)
-                  }{
-                    data?.user?.posts.map((item)=> <Cart key={item.id} {...item} />)
-                  }{
-                    data?.user?.posts.map((item)=> <Cart key={item.id} {...item} />)
-                  }{
-                    data?.user?.posts.map((item)=> <Cart key={item.id} {...item} />)
-                  }{
-                    data?.user?.posts.map((item)=> <Cart key={item.id} {...item} />)
-                  }{
-                    data?.user?.posts.map((item)=> <Cart key={item.id} {...item} />)
-                  }{
                     data?.user?.posts.map((item)=> <Cart key={item.id} {...item} />)
                   }
             </div>            
-    </div>
+    </>
   )
 }
 UserInfo.getLayout = function getLayout(page: ReactNode) {

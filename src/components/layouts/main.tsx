@@ -13,8 +13,7 @@ const MainLayout: NextPage<Props> = ({children}) => {
     <>
     <Navbar />
         <main
-          style={{ scrollBehavior: 'smooth' }}
-          className=" mx-auto   max-w-7xl overflow-auto py-2  ">
+          className=" mx-auto max-w-7xl">
           {children}
           <Toaster />
         </main>

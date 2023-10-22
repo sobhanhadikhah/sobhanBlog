@@ -94,7 +94,7 @@ const BottomNavigation: NextPage<Props> = ({postId,refetchPost,_count,favorite})
     {
       showModal ? <MyModal setIsShowModal={setShowModal}  /> : null
     }
-  <div className="fixed md:bottom-12 bottom-0 md:max-w-2xl  mx-auto  !z-[90000] w-full md:left-10 md:right-10 block  md:rounded-full  bg-black  shadow-sm    ">
+  <div className="fixed md:bottom-12  bottom-0 md:max-w-2xl  mx-auto  !z-[90000] w-full md:left-10 md:right-10 block  md:rounded-full  bg-black  shadow-sm    ">
   <div className="  flex  w-full items-center  justify-around gap-5 p-3  ">
     
     <ToolTip content='like' >
