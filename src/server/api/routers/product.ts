@@ -7,15 +7,15 @@ import { createTRPCRouter, protectedProcedure, publicProcedure } from '~/server/
 import { S3Client, PutObjectCommand, type S3ClientConfig } from '@aws-sdk/client-s3';
 import sharp from 'sharp';
 
-const s3Config: S3ClientConfig = {
+/* const s3Config: S3ClientConfig = {
   region: 'your-aws-region', // Replace 'your-aws-region' with the appropriate AWS region, e.g., 'us-east-1'
   endpoint: process.env.LIARA_ENDPOINT,
   credentials: {
-    accessKeyId: process.env.LIARA_ACCESS_KEY ?? '',
-    secretAccessKey: process.env.LIARA_SECRET_KEY ?? '',
+    accessKeyId: process.env.LIARA_ACCESS_KEY,
+    secretAccessKey: process.env.LIARA_SECRET_KEY,
   },
 };
-const client = new S3Client(s3Config);
+const client = new S3Client(s3Config); */
 
 export const productRouter = createTRPCRouter({
   getAll: publicProcedure
@@ -126,7 +126,7 @@ export const productRouter = createTRPCRouter({
         throw new Error('Error creating a post');
       }
     }),
-  uploadCover: protectedProcedure
+  /* uploadCover: protectedProcedure
     .input(z.object({ file: z.string(), path: z.string() }))
     .mutation(async ({ input, ctx }) => {
       try {
@@ -154,7 +154,7 @@ export const productRouter = createTRPCRouter({
       } catch (error) {
         throw new Error('wrong');
       }
-    }),
+    }), */
 
   deleteProduct: protectedProcedure
     .input(z.object({ id: z.string() }))
