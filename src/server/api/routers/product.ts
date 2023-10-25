@@ -7,15 +7,6 @@ import { createTRPCRouter, protectedProcedure, publicProcedure } from '~/server/
 import { S3Client, PutObjectCommand, type S3ClientConfig } from '@aws-sdk/client-s3';
 import sharp from 'sharp';
 import { env } from '~/env.mjs';
-const s3Config: S3ClientConfig = {
-  region: 'default', // Replace 'your-aws-region' with the appropriate AWS region, e.g., 'us-east-1'
-  endpoint: env.LIARA_ENDPOINT,
-  credentials: {
-    accessKeyId: env.LIARA_ACCESS_KEY,
-    secretAccessKey: env.LIARA_SECRET_KEY,
-  },
-};
-const client = new S3Client(s3Config);
 
 export const productRouter = createTRPCRouter({
   getAll: publicProcedure
@@ -130,6 +121,15 @@ export const productRouter = createTRPCRouter({
     .input(z.object({ file: z.string(), path: z.string() }))
     .mutation(async ({ input, ctx }) => {
       try {
+        const s3Config: S3ClientConfig = {
+          region: 'default', // Replace 'your-aws-region' with the appropriate AWS region, e.g., 'us-east-1'
+          endpoint: env.LIARA_ENDPOINT,
+          credentials: {
+            accessKeyId: env.LIARA_ACCESS_KEY,
+            secretAccessKey: env.LIARA_SECRET_KEY,
+          },
+        };
+        const client = new S3Client(s3Config);
         const fileName = Date.now();
         const { file, path } = input;
         const jpegBuffer = await sharp(Buffer.from(file, 'base64')).toFormat('jpeg').toBuffer();
