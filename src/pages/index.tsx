@@ -142,8 +142,8 @@ export default function Home() {
             ))}
           </div>
           {/* posts */}
-          {!isInitialLoading
-            ? posts.map((item) => <Cart refetch={refetch} key={item.id} {...item} />)
+          {!isLoading && posts
+            ? posts?.map((item) => <Cart refetch={refetch} key={item.id} {...item} />)
             : Array(6)
                 .fill('id')
                 .map((item, index) => (
