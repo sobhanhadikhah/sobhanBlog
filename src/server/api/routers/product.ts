@@ -8,7 +8,7 @@ import { S3Client, PutObjectCommand, type S3ClientConfig } from '@aws-sdk/client
 import sharp from 'sharp';
 import { env } from '~/env.mjs';
 const s3Config: S3ClientConfig = {
-  region: 'your-aws-region', // Replace 'your-aws-region' with the appropriate AWS region, e.g., 'us-east-1'
+  region: 'default', // Replace 'your-aws-region' with the appropriate AWS region, e.g., 'us-east-1'
   endpoint: env.LIARA_ENDPOINT,
   credentials: {
     accessKeyId: env.LIARA_ACCESS_KEY,
