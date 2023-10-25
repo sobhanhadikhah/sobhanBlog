@@ -184,10 +184,10 @@ export default function CreatePost() {
   };
 
   return (
-    <div className=" mx-auto   mt-5 max-w-7xl !overflow-hidden  ">
+    <div className=" mx-auto   mt-5  max-w-7xl  ">
       <div className="!overflow-hidden">
-        <form onSubmit={handleSubmit} className="!overflow-hidden">
-          <div className="grid grid-cols-12 items-center justify-center  gap-5 !overflow-hidden ">
+        <form onSubmit={handleSubmit} className="">
+          <div className="grid grid-cols-12 items-center justify-center  gap-5  ">
             {/* Title */}
 
             {cover ? (
@@ -305,6 +305,7 @@ export default function CreatePost() {
               style={{
                 zIndex: 600,
                 color: 'white',
+                height: cover ? 'calc(100vh - 475px)' : 'calc(100vh - 239px)',
               }}
               theme="dark"
               showToolbarName
@@ -312,28 +313,29 @@ export default function CreatePost() {
               autoDetectCode
               showCodeRowNumber
               language="en-US"
-              className="col-span-12 w-full"
+              className="col-span-12  w-full "
               modelValue={value.content}
               onChange={(e) => setValue((prev) => ({ ...prev, content: e }))}
             />
-
-            <div className="flex gap-3">
-              <Button
-                isLoading={isLoadingCreatePost}
-                type="submit"
-                className="col-span-6   rounded-md bg-sky-500 ">
-                Publish
-              </Button>
-              <Button
-                onClick={() => setPreview(true)}
-                isLoading={isLoadingCreatePost}
-                type="button"
-                className="col-span-6   rounded-md bg-sky-500 ">
-                Preview
-              </Button>
-            </div>
           </div>
         </form>
+      </div>
+      <div className=" fixed bottom-0 left-0 right-0 z-[610] col-span-12  mt-auto flex w-full gap-3 bg-[#171717] px-3 py-3 md:bg-black ">
+        <div className="mx-auto flex w-full max-w-7xl gap-3 ">
+          <Button
+            isLoading={isLoadingCreatePost}
+            type="submit"
+            className="col-span-6   rounded-md bg-sky-500 ">
+            Publish
+          </Button>
+          <Button
+            onClick={() => setPreview(true)}
+            isLoading={isLoadingCreatePost}
+            type="button"
+            className="col-span-6   rounded-md  ">
+            Preview
+          </Button>
+        </div>
       </div>
     </div>
   );

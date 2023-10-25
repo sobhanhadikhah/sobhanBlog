@@ -4,25 +4,7 @@
 body {
   @apply bg-black text-neutral-100;
 }
-/* width */
-::-webkit-scrollbar {
-  width: 1px;
-}
 
-/* Track */
-::-webkit-scrollbar-track {
-  background: #000;
-}
-
-/* Handle */
-::-webkit-scrollbar-thumb {
-  background: none;
-}
-
-/* Handle on hover */
-::-webkit-scrollbar-thumb:hover {
-  background: none;
-}
 .custom-select .css-1pahdxg-control {
   color: white;
 }
