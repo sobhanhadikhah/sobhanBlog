@@ -79,7 +79,7 @@ export default function Home() {
     },
   ];
 
-  const { data: tagsData, isLoading: isLoadingTags } = api.tag.getAllTag.useQuery();
+  const { data: tagsData, isLoading: isLoadingTags } = api.tag.getAllTagResult.useQuery();
 
   return (
     <>

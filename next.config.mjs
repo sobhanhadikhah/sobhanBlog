@@ -16,7 +16,11 @@ const config = {
     defaultLocale: 'en',
   },
   images: {
-    domains: ['cdn.discordapp.com', 'lh3.googleusercontent.com'],
+    domains: [
+      'cdn.discordapp.com',
+      'lh3.googleusercontent.com',
+      'sobhanblog.storage.iran.liara.space',
+    ],
   },
   eslint: {
     ignoreDuringBuilds: true,

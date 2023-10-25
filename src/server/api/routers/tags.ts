@@ -62,7 +62,7 @@ export const tagsRouter = createTRPCRouter({
       };
     } catch (error) {}
   }),
-  getAllTag: publicProcedure.query(({ ctx }) => {
+  getAllTagResult: publicProcedure.query(({ ctx }) => {
     return ctx.db.tag.findMany({
       include: {
         _count: {
@@ -82,5 +82,8 @@ export const tagsRouter = createTRPCRouter({
         },
       },
     });
+  }),
+  getAllTag: publicProcedure.query(({ ctx }) => {
+    return ctx.db.tag.findMany({});
   }),
 });

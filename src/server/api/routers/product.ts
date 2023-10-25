@@ -4,6 +4,18 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 import { z } from 'zod';
 import { createTRPCRouter, protectedProcedure, publicProcedure } from '~/server/api/trpc';
+import { S3Client, PutObjectCommand, type S3ClientConfig } from '@aws-sdk/client-s3';
+import sharp from 'sharp';
+
+const s3Config: S3ClientConfig = {
+  region: 'your-aws-region', // Replace 'your-aws-region' with the appropriate AWS region, e.g., 'us-east-1'
+  endpoint: process.env.LIARA_ENDPOINT,
+  credentials: {
+    accessKeyId: process.env.LIARA_ACCESS_KEY ?? '',
+    secretAccessKey: process.env.LIARA_SECRET_KEY ?? '',
+  },
+};
+const client = new S3Client(s3Config);
 
 export const productRouter = createTRPCRouter({
   getAll: publicProcedure
@@ -83,7 +95,7 @@ export const productRouter = createTRPCRouter({
       z.object({
         title: z.string(),
         content: z.string(),
-        image: z.string(),
+        image: z.string().nullable(),
         tags: z.array(z.string()),
       }),
     )
@@ -95,7 +107,7 @@ export const productRouter = createTRPCRouter({
             title: input.title,
             content: input.content,
             userId: ctx.session.user.id,
-            image: input.image || null,
+            image: input.image,
             tags: {
               connect: tagIds.map((tagId) => ({ id: tagId })), // Connect the provided tag IDs to the post
             },
@@ -112,6 +124,35 @@ export const productRouter = createTRPCRouter({
         };
       } catch (error) {
         throw new Error('Error creating a post');
+      }
+    }),
+  uploadCover: protectedProcedure
+    .input(z.object({ file: z.string(), path: z.string() }))
+    .mutation(async ({ input, ctx }) => {
+      try {
+        const fileName = Date.now();
+        const { file, path } = input;
+        const jpegBuffer = await sharp(Buffer.from(file, 'base64')).toFormat('jpeg').toBuffer();
+        const param = {
+          Body: jpegBuffer,
+          Bucket: process.env.LIARA_BUCKET_NAME,
+          Key: `${path}/${ctx.session.user.id}/${fileName}.jpg`,
+          ContentType: 'image/jpeg',
+        };
+        await client.send(new PutObjectCommand(param), (er, data) => {
+          if (er) {
+            console.log(er);
+          } else {
+            console.log(data);
+          }
+        });
+        return {
+          status: 200,
+          message: 'true',
+          url: `https://sobhanblog.storage.iran.liara.space/${path}/${ctx.session.user.id}/${fileName}.jpg`,
+        };
+      } catch (error) {
+        throw new Error('wrong');
       }
     }),
 

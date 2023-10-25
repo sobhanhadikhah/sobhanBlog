@@ -23,3 +23,16 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: none;
 }
+.custom-select .css-1pahdxg-control {
+  color: white;
+}
+.custom-select .css-1pahdxg-control input {
+  color: white;
+}
+.custom-select .css-1wa2cjx-control {
+  outline: none;
+}
+
+.custom-select .css-1pahdxg-control:hover {
+  border-color: black; /* You can set the border color when hovering */
+}
