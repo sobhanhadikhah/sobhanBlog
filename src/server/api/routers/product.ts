@@ -4,10 +4,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 import { z } from 'zod';
 import { createTRPCRouter, protectedProcedure, publicProcedure } from '~/server/api/trpc';
-import { S3Client, PutObjectCommand, type S3ClientConfig } from '@aws-sdk/client-s3';
-import sharp from 'sharp';
-import { env } from '~/env.mjs';
-
 export const productRouter = createTRPCRouter({
   getAll: publicProcedure
     .input(
@@ -115,44 +111,6 @@ export const productRouter = createTRPCRouter({
         };
       } catch (error) {
         throw new Error('Error creating a post');
-      }
-    }),
-  uploadCover: protectedProcedure
-    .input(z.object({ file: z.string(), path: z.string() }))
-    .mutation(async ({ input, ctx }) => {
-      try {
-        const s3Config: S3ClientConfig = {
-          region: 'default', // Replace 'your-aws-region' with the appropriate AWS region, e.g., 'us-east-1'
-          endpoint: env.LIARA_ENDPOINT,
-          credentials: {
-            accessKeyId: env.LIARA_ACCESS_KEY,
-            secretAccessKey: env.LIARA_SECRET_KEY,
-          },
-        };
-        const client = new S3Client(s3Config);
-        const fileName = Date.now();
-        const { file, path } = input;
-        const jpegBuffer = await sharp(Buffer.from(file, 'base64')).toFormat('jpeg').toBuffer();
-        const param = {
-          Body: jpegBuffer,
-          Bucket: env.LIARA_BUCKET_NAME,
-          Key: `${path}/${ctx.session.user.id}/${fileName}.jpg`,
-          ContentType: 'image/jpeg',
-        };
-        await client.send(new PutObjectCommand(param), (er, data) => {
-          if (er) {
-            console.log(er);
-          } else {
-            console.log(data);
-          }
-        });
-        return {
-          status: 200,
-          message: 'true',
-          url: `https://sobhanblog.storage.iran.liara.space/${path}/${ctx.session.user.id}/${fileName}.jpg`,
-        };
-      } catch (error) {
-        throw new Error('wrong');
       }
     }),
 
