@@ -35,7 +35,7 @@ export default function CreatePost() {
   const [preview, setPreview] = useState(false);
   const [cover, setCover] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const { mutate: uploadPhoto } = api.post.uploadCover.useMutation();
+  const { mutate: uploadPhoto } = api.upload.uploadCover.useMutation();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
