@@ -40,6 +40,7 @@
     "react-loading-skeleton": "^3.3.1",
     "react-select": "^5.7.4",
     "rehype": "^13.0.1",
+    "sharp": "^0.32.6",
     "superjson": "^1.13.1",
     "ws": "^8.14.1",
     "zod": "^3.21.4"

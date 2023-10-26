@@ -16,10 +16,19 @@ const config = {
     defaultLocale: 'en',
   },
   images: {
+    formats: ['image/avif', 'image/webp'],
     domains: [
       'cdn.discordapp.com',
       'lh3.googleusercontent.com',
       'sobhanblog.storage.iran.liara.space',
+    ],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'storage.iran.liara.space',
+        port: '',
+        pathname: '/sobhanblog/**',
+      },
     ],
   },
   eslint: {

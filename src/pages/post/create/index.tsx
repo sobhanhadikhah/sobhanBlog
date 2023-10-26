@@ -195,9 +195,10 @@ export default function CreatePost() {
                 <Image
                   blurDataURL="URL"
                   placeholder="blur"
-                  src={cover}
+                  src={`${cover}`}
                   alt="cover"
                   fill
+                  quality={70}
                   style={{ objectFit: 'cover' }}
                 />
               </div>
@@ -318,24 +319,24 @@ export default function CreatePost() {
               onChange={(e) => setValue((prev) => ({ ...prev, content: e }))}
             />
           </div>
+          <div className=" fixed bottom-0 left-0 right-0 z-[610] col-span-12  mt-auto flex w-full gap-3 bg-[#171717] px-3 py-3 md:bg-black ">
+            <div className="mx-auto flex w-full max-w-7xl gap-3 ">
+              <Button
+                isLoading={isLoadingCreatePost}
+                type="submit"
+                className="col-span-6   rounded-md bg-sky-500 ">
+                Publish
+              </Button>
+              <Button
+                onClick={() => setPreview(true)}
+                isLoading={isLoadingCreatePost}
+                type="button"
+                className="col-span-6   rounded-md  ">
+                Preview
+              </Button>
+            </div>
+          </div>
         </form>
-      </div>
-      <div className=" fixed bottom-0 left-0 right-0 z-[610] col-span-12  mt-auto flex w-full gap-3 bg-[#171717] px-3 py-3 md:bg-black ">
-        <div className="mx-auto flex w-full max-w-7xl gap-3 ">
-          <Button
-            isLoading={isLoadingCreatePost}
-            type="submit"
-            className="col-span-6   rounded-md bg-sky-500 ">
-            Publish
-          </Button>
-          <Button
-            onClick={() => setPreview(true)}
-            isLoading={isLoadingCreatePost}
-            type="button"
-            className="col-span-6   rounded-md  ">
-            Preview
-          </Button>
-        </div>
       </div>
     </div>
   );

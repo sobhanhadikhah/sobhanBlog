@@ -27,7 +27,7 @@ export const uploadRoute = createTRPCRouter({
         const image = await Jimp.read(imageBuffer);
 
         // Resize the image (you can adjust width and height as needed)
-        image.resize(1280, 720); // For example, resize to 200x200 pixels
+         // For example, resize to 200x200 pixels
 
         // Convert the image back to a buffer
         const processedImageBuffer = await image.getBufferAsync(Jimp.MIME_JPEG);
@@ -35,22 +35,16 @@ export const uploadRoute = createTRPCRouter({
         const param = {
           Body: processedImageBuffer,
           Bucket: env.LIARA_BUCKET_NAME,
-          Key: `${path}/${ctx.session.user.id}/${fileName}.jpg`,
+          Key: `${path}/${fileName}.jpg`,
           ContentType: 'image/jpeg',
         };
 
-        await client.send(new PutObjectCommand(param), (er, data) => {
-          if (er) {
-            console.log(er);
-          } else {
-            console.log(data);
-          }
-        });
+       await client.send(new PutObjectCommand(param));
 
         return {
           status: 200,
           message: 'true',
-          url: `https://sobhanblog.storage.iran.liara.space/${path}/${ctx.session.user.id}/${fileName}.jpg`,
+          url: `https://sobhanblog.storage.iran.liara.space/${path}/${fileName}.jpg`,
         };
       } catch (error) {
         throw new Error('An error occurred while processing the image.');
