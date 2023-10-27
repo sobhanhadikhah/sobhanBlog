@@ -10,14 +10,15 @@ import { type NextPage } from 'next';
 import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { type ReactNode, useState } from 'react';
 import toast from 'react-hot-toast';
 import BottomNavigation from '~/components/bottomNavigation';
 import { api } from '~/utils/api';
 import 'md-editor-rt/lib/preview.css';
 import Link from 'next/link';
 import Loading from '~/components/elemnt/loading';
-const PostInfo: NextPage = () => {
+import MainLayout from '~/components/layouts/main';
+export default function PostInfo() {
   const { query } = useRouter();
   const { status: sessionStatus } = useSession();
   const unAuthorized = sessionStatus === 'unauthenticated';
@@ -56,9 +57,28 @@ const PostInfo: NextPage = () => {
     }
   }
   return (
-    <div style={{ scrollBehavior: 'smooth' }} className="mx-auto max-w-3xl pt-3  ">
+    <div style={{ scrollBehavior: 'smooth' }} className="mx-auto max-w-3xl bg-[#171717] ">
+      {data.post?.image ? (
+        <div
+          style={{ width: '100%', height: '100%' }}
+          className="relative col-span-12 mt-0 aspect-video w-full md:mt-3  ">
+          <Image
+            loading="lazy"
+            blurDataURL="URL"
+            placeholder="blur"
+            src={`${data.post?.image}`}
+            alt="cover"
+            fill
+            sizes="100vw"
+            quality={70}
+            className="rounded-none md:rounded-t-lg "
+            style={{ objectFit: 'cover', width: '100%', height: '100%' }}
+          />
+        </div>
+      ) : null}
       <main>
-        <div className="!z-[50] bg-black  px-3  md:rounded-md  ">
+        {/* userinfo */}
+        <div className="!z-[50]   p-3  md:rounded-md  ">
           <div className="flex items-center gap-2  ">
             {data.post?.user.image ? (
               <Image
@@ -83,9 +103,9 @@ const PostInfo: NextPage = () => {
           <div className="flex justify-between">
             <h1 className="text-4xl font-bold md:text-7xl ">{data.post?.title}</h1>
           </div>
-          {/* tags */}
         </div>
-        {/* content */}
+
+        {/* tags */}
         <div className=" h-[100vh] pb-10 ">
           <div className=" flex gap-3 bg-black px-3 pt-3 ">
             {data.post?.tags.map((item) => (
@@ -96,8 +116,9 @@ const PostInfo: NextPage = () => {
               </Link>
             ))}
           </div>
+          {/* content */}
           <MdPreview
-            style={{ backgroundColor: '#000', zIndex: '400' }}
+            style={{ backgroundColor: '#000' }}
             showCodeRowNumber
             modelValue={data.post?.content ?? ''}
             theme="dark"
@@ -170,6 +191,8 @@ const PostInfo: NextPage = () => {
       />
     </div>
   );
-};
+}
 
-export default PostInfo;
+PostInfo.getLayout = function getLayout(page: ReactNode) {
+  return <MainLayout>{page}</MainLayout>;
+};

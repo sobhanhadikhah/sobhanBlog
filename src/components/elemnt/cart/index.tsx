@@ -7,6 +7,7 @@ import Image from 'next/image';
 import { useState } from 'react';
 import { type _count } from '~/types/post/index.';
 import { type User, type Favorite, type Like, type Tag } from '~/types/post/index.';
+import Loading from '../loading';
 
 interface Props {
   title: string;
@@ -43,15 +44,17 @@ const Cart: NextPage<Props> = ({ title, id, createdAt, tags, user, favorite, _co
   return (
     <div className="z-50 col-span-12  mx-0  rounded-none bg-[#171717] ring-sky-500 hover:ring-2 focus:outline-none md:mx-1 md:rounded-md md:ring-0 ">
       {image ? (
-        <div style={{ width: '100%' }} className="relative col-span-12 h-[220px] w-full  ">
+        <div
+          style={{ width: '100%' }}
+          className="relative col-span-12 aspect-video max-h-[400px]  w-full  ">
           <Image
+            loading="lazy"
             blurDataURL="URL"
             placeholder="blur"
             src={`${image}`}
             alt="cover"
             fill
             quality={70}
-            style={{ objectFit: 'cover' }}
           />
         </div>
       ) : null}
