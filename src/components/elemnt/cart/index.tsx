@@ -113,6 +113,7 @@ export default function Cart({ title, id, createdAt, tags, user, favorite, _coun
               ) : null}
 
               <Link
+                prefetch
                 href={`post/${id}#commentSection`}
                 className="flex items-center gap-1 rounded-md p-1  transition-all duration-150  hover:bg-[#1f1f1f] ">
                 {' '}

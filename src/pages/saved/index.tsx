@@ -8,6 +8,7 @@ import { useState, type ReactNode } from 'react';
 import { useInView } from 'react-intersection-observer';
 import Cart from '~/components/elemnt/cart';
 import { ProtectedLayout } from '~/components/layout/protectedLayouts/protectedLayouts';
+import MainLayout from '~/components/layouts/main';
 import { api } from '~/utils/api';
 
 
@@ -59,6 +60,9 @@ const handleFetchNextPage = async () => {
   }
   return (<div className='max-w-7xl mx-auto ' >
         <div className='col-span-12  w-full  grid h-full grid-cols-12 items-start gap-y-2  overflow-auto md:col-span-8 ' >
+          <h2 className='col-span-12 font-bold p-3 w-full text-3xl' >
+            Reading List ({data?.pages[page]?.count})
+          </h2>
             {
               posts?.map((item)=> <Cart key={item.id} {...item.post} refetch={refetch} />)
             }
@@ -73,6 +77,6 @@ const handleFetchNextPage = async () => {
 };
 
 Page.getLayout = function getLayout(page: ReactNode) {
-  return <ProtectedLayout>{page}</ProtectedLayout>;
+  return <ProtectedLayout> <MainLayout>{page}</MainLayout> </ProtectedLayout>;
 };
 

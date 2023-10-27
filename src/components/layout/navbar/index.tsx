@@ -1,11 +1,13 @@
-import { LightbulbFilament } from '@phosphor-icons/react';
+import { LightbulbFilament, MagnifyingGlass } from '@phosphor-icons/react';
 import { signIn, signOut, useSession } from 'next-auth/react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect, useCallback, type FormEvent } from 'react';
 import { useOutsideClick } from '~/hook/useOutsideClick';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useRouter } from 'next/router';
+import { api } from '~/utils/api';
+import { useDebounce } from '~/hook/useDebounce';
 function Navbar() {
   const { data: sessionData, status } = useSession();
   const authorized = status === 'authenticated';
@@ -15,28 +17,69 @@ function Navbar() {
   const [toggle, setToggle] = useState(false);
   const { push } = useRouter();
   const sidebarRef = useRef(null);
+  const [query, setQuery] = useState('');
 
-  // Close the sidebar when clicking outside of it
   useOutsideClick(sidebarRef, () => {
     setToggle(false);
   });
+  const { data, mutate } = api.post.search.useMutation({
+    onSuccess(data) {
+      console.log(data);
+    },
+  });
+
   async function handleSignOut() {
     await push('/');
     await signOut();
   }
+  // Handle search with debouncing
 
+  /* useDebounce(
+    () => {
+      if (query) {
+        mutate({ query });
+      }
+    },
+    300,
+    [query],
+  ); */
+  async function handleSearchPush(e: FormEvent) {
+    e.preventDefault();
+    if (query) {
+      await push({ pathname: '/search', query: { query: query } });
+    } else {
+      return;
+    }
+  }
   return (
     <>
       <nav className=" sticky top-0 z-[500] mx-auto w-full   border-b border-black bg-[#171717] ">
         <div className="mx-auto  flex max-w-7xl flex-row items-center justify-between gap-3 px-3 py-3 ">
-          <div className="items-center ">
+          <div className="flex  items-center gap-3 ">
             <Link href={'/'}>
               <LightbulbFilament size={36} className="hover:text-yellow-300" />
             </Link>
+            <form
+              onSubmit={(e) => void handleSearchPush(e)}
+              className="relative  hidden items-center md:flex ">
+              <input
+                placeholder="Search..."
+                className=" rounded-md border-none bg-transparent px-2 py-2 text-white ring-1 ring-white focus:outline-none focus:outline-2   focus:ring-purple-500 "
+                type="search"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+              />
+              <button type="submit" className="absolute right-2 ">
+                <MagnifyingGlass size={26} />
+              </button>
+            </form>
           </div>
           <div>
             {authorized ? (
               <div className="flex items-center gap-3 ">
+                <Link href={'/search'} type="button" className="block md:hidden">
+                  <MagnifyingGlass size={26} />
+                </Link>
                 <Link
                   className="hidden rounded-sm px-3 py-2 font-semibold ring-2 ring-white hover:bg-white hover:text-black md:flex "
                   href={'/post/create'}>

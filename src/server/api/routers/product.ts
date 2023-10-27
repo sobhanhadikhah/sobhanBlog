@@ -317,7 +317,7 @@ export const productRouter = createTRPCRouter({
           const nextItem = posts.pop(); // return the last item from the array
           nextCursor = nextItem?.id;
         }
-        const count = await ctx.db.post.count();
+        const count = await ctx.db.favorite.count({ where: { userId: ctx.session?.user.id } });
         const totalPages = Math.ceil(count / input.limit);
 
         return {
@@ -347,4 +347,34 @@ export const productRouter = createTRPCRouter({
       }),
     };
   }),
+  search: publicProcedure
+    .input(z.object({ query: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      try {
+        const result = await ctx.db.post.findMany({
+          where: {
+            OR: [
+              {
+                title: {
+                  contains: input.query,
+                },
+              },
+              {
+                tags: {
+                  some: {
+                    value: input.query,
+                  },
+                },
+              },
+            ],
+          },
+        });
+        return {
+          query: input.query,
+          result,
+          status: 200,
+          message: 'true',
+        };
+      } catch (error) {}
+    }),
 });
