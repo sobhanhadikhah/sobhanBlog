@@ -19,10 +19,12 @@ const CreatePostLayout: NextPage<Props> = ({children,createPost}) => {
           {children}
           <Toaster />
         </main>
-        <div className='sticky items-center gap-3 bottom-0 w-full bg-[#171717] h-[58px] flex justify-between' >
+        <div className='sticky items-center   gap-3 bottom-0 w-full bg-[#171717] md:bg-black h-[58px] flex ' >
+            <div className='max-w-7xl mx-auto  w-full  ' >
           <Button className='bg-purple-500 mx-3 font-bold rounded-md text-lg ' type='button' onClick={createPost} >
             Publish
           </Button>
+            </div>
       </div>
     </>
   )

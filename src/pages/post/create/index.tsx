@@ -12,11 +12,11 @@ import toast from 'react-hot-toast';
 import { MdEditor } from 'md-editor-rt';
 import 'md-editor-rt/lib/style.css';
 import { useRouter } from 'next/router';
-import Button from '~/components/elemnt/button';
 import { signIn, useSession } from 'next-auth/react';
 import { ProtectedLayout } from '~/components/layout/protectedLayouts/protectedLayouts';
 import Image from 'next/image';
 import CreatePostLayout from '~/components/layout/createPost';
+import { Spinner } from '@phosphor-icons/react';
 interface Post {
   title: string;
   content: string;
@@ -32,16 +32,14 @@ interface Option {
 export default function CreatePost() {
   const router = useRouter();
   const { status } = useSession();
-  const [file, setFile] = useState<File | null>(null);
-  const [preview, setPreview] = useState(false);
+
   const [cover, setCover] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const { mutate: uploadPhoto } = api.upload.uploadCover.useMutation();
+  const { mutate: uploadPhoto, isLoading: isUploading } = api.upload.uploadCover.useMutation();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     if (selectedFile) {
-      setFile(selectedFile);
       const reader = new FileReader();
       reader.onload = (event) => {
         if (event.target && typeof event.target.result === 'string') {
@@ -64,7 +62,7 @@ export default function CreatePost() {
     // Read the selected file as a base64 encoded string
   };
   // const { data: categoryData } = api.category.getCategory.useQuery();
-  const { mutate: createPost, isLoading: isLoadingCreatePost } = api.post.createPost.useMutation({
+  const { mutate: createPost } = api.post.createPost.useMutation({
     onSuccess() {
       toast.success('Ok', { id: 'post' });
       router.push('/');
@@ -191,8 +189,10 @@ export default function CreatePost() {
             <div className="grid grid-cols-12 items-center justify-center  gap-5  ">
               {/* Title */}
 
-              {cover ? (
-                <div style={{ width: '100%' }} className="relative col-span-12 h-[220px] w-full  ">
+              {cover && !isUploading ? (
+                <div
+                  style={{ width: '100%' }}
+                  className="relative col-span-12 aspect-video  w-full  ">
                   <Image
                     blurDataURL="URL"
                     placeholder="blur"
@@ -200,8 +200,15 @@ export default function CreatePost() {
                     alt="cover"
                     fill
                     quality={70}
-                    style={{ objectFit: 'cover' }}
                   />
+                </div>
+              ) : null}
+              {isUploading ? (
+                <div className="col-span-12 flex flex-col items-center justify-center gap-5 text-center text-3xl ">
+                  <span className="animate-spin text-purple-100 ">
+                    <Spinner size={36} />
+                  </span>{' '}
+                  Uploading{' '}
                 </div>
               ) : null}
 
@@ -212,9 +219,11 @@ export default function CreatePost() {
                 onChange={handleFileChange}
                 className="col-span-12"
               />
-              <button onClick={handleFileButtonClick} className="col-span-6">
-                {cover ? 'Change' : 'Add a cover image'}
-              </button>
+              {!isUploading ? (
+                <button onClick={handleFileButtonClick} className="col-span-6   ">
+                  {cover ? 'Change' : 'Add a cover image'}
+                </button>
+              ) : null}
               {cover ? (
                 <button
                   onClick={() => {
@@ -299,7 +308,7 @@ export default function CreatePost() {
                   style={{
                     color: 'white',
 
-                    height: cover ? 'calc(100vh - 475px)' : 'calc(100vh - 239px)',
+                    height: 'calc(100vh - 239px)',
                   }}
                   theme="dark"
                   showToolbarName
@@ -313,23 +322,6 @@ export default function CreatePost() {
                 />
               </div>
             </div>
-            {/*  <div className="sticky bottom-0 left-0 right-0 z-[610] col-span-12  flex w-full bg-[#171717] px-3 py-3 md:bg-black">
-            <div className="mx-auto flex w-full max-w-7xl gap-3">
-              <Button
-                isLoading={isLoadingCreatePost}
-                type="submit"
-                className="col-span-6 rounded-md bg-sky-500">
-                Publish
-              </Button>
-              <Button
-                onClick={() => setPreview(true)}
-                isLoading={isLoadingCreatePost}
-                type="button"
-                className="col-span-6 rounded-md">
-                Preview
-              </Button>
-            </div>
-          </div> */}
           </div>
         </div>
       </div>

@@ -21,7 +21,7 @@ export default function Home() {
   const { ref } = useInView({
     onChange(inView) {
       if (inView && page < totalPage - 1) {
-        handleFetchNextPage();
+        void handleFetchNextPage();
       }
     },
   });
@@ -53,17 +53,10 @@ export default function Home() {
     return [...acc, ...page.posts];
   }, []);
 
-  const handleFetchNextPage = () => {
-    console.log('from fetch start', page);
+  const handleFetchNextPage = async () => {
     setPage((prev) => prev + 1);
 
-    // Define the query key for the new page
-
-    // Invalidate the cache for the next page
-
-    fetchNextPage();
-
-    console.log('from fetch end', page);
+    await fetchNextPage();
   };
 
   const sortButtons = [
@@ -151,7 +144,7 @@ export default function Home() {
                     key={`skeleton${index}`}
                     height={411}
                     baseColor="#202020"
-                    highlightColor="#444">
+                    highlightColor="#444;">
                     <div className="z-50 col-span-12 h-full rounded-none bg-[#171717] px-3 md:rounded-md">
                       <div className="flex flex-col ">
                         {/* profile auth */}

@@ -31,37 +31,85 @@ export const tagsRouter = createTRPCRouter({
         throw new Error('Error creating a tag');
       }
     }),
-  postByTag: publicProcedure.input(z.object({ id: z.string() })).query(async ({ ctx, input }) => {
-    try {
-      const posts = await ctx.db.post.findMany({
-        include: {
-          tags: true,
-          user: true,
-          comment: true,
-          like: true,
-          _count: {
-            select: {
-              comment: true,
-              like: true,
-              favorite: true,
+  postByTag: publicProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        limit: z.number(),
+        cursor: z.string().nullish(),
+        order: z.string().optional().nullable(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      try {
+        const { cursor, limit, order } = input;
+        const orderBy = [];
+
+        // Add the default ordering condition if 'order' is not specified
+        if (!order) {
+          orderBy.push({ createdAt: 'desc' });
+        } else {
+          // Parse the 'order' parameter and add multiple ordering conditions
+          const orderFields = order.split(',');
+
+          for (const field of orderFields) {
+            if (field === 'createdAt') {
+              orderBy.push({ createdAt: 'desc' });
+            } else if (field === 'likeCount') {
+              orderBy.push({ like: { _count: 'desc' } });
+            }
+            // Add more conditions for other fields as needed
+          }
+        }
+        const posts = await ctx.db.post.findMany({
+          take: limit + 1,
+          cursor: cursor ? { id: cursor } : undefined,
+          where: {
+            tags: {
+              some: {
+                id: input.id,
+              },
             },
           },
-        },
-        where: {
-          tags: {
-            some: {
-              id: input.id,
+          orderBy: orderBy as never[],
+          include: {
+            tags: true,
+            like: true,
+            _count: {
+              select: {
+                like: true,
+                comment: true,
+              },
             },
+            favorite: {
+              where: {
+                userId: ctx.session?.user.id,
+              },
+            },
+            comment: true,
+            user: true,
           },
-        },
-      });
-      return {
-        posts,
-        status: 200,
-        success: true,
-      };
-    } catch (error) {}
-  }),
+        });
+
+        let nextCursor: typeof cursor | undefined = undefined;
+        if (posts.length > limit) {
+          const nextItem = posts.pop(); // return the last item from the array
+          nextCursor = nextItem?.id;
+        }
+        const count = await ctx.db.post.count();
+        const totalPages = Math.ceil(count / input.limit);
+
+        return {
+          posts,
+          nextCursor,
+          count,
+          totalPages,
+        };
+      } catch (error) {
+        // Handle errors appropriately
+        throw error;
+      }
+    }),
   getAllTagResult: publicProcedure.query(({ ctx }) => {
     return ctx.db.tag.findMany({
       include: {
@@ -81,6 +129,13 @@ export const tagsRouter = createTRPCRouter({
           _count: 'desc',
         },
       },
+    });
+  }),
+  tagInfoById: publicProcedure.input(z.object({ id: z.string() })).query(({ ctx, input }) => {
+    const { id } = input;
+    return ctx.db.tag.findFirst({
+      where: { id },
+      include: { _count: { select: { posts: true } } },
     });
   }),
   getAllTag: publicProcedure.query(({ ctx }) => {

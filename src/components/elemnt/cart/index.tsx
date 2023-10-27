@@ -1,4 +1,3 @@
-import { type NextPage } from 'next';
 import format from 'date-fns/format';
 import { api } from '~/utils/api';
 import { BookmarkSimple, Heart, Chat } from '@phosphor-icons/react';
@@ -7,7 +6,6 @@ import Image from 'next/image';
 import { useState } from 'react';
 import { type _count } from '~/types/post/index.';
 import { type User, type Favorite, type Like, type Tag } from '~/types/post/index.';
-import Loading from '../loading';
 
 interface Props {
   title: string;
@@ -21,10 +19,10 @@ interface Props {
   comment?: Comment[];
   favorite?: Favorite[] | undefined;
   _count?: _count;
-  image: string;
+  image: string | null;
 }
 
-const Cart: NextPage<Props> = ({ title, id, createdAt, tags, user, favorite, _count, image }) => {
+export default function Cart({ title, id, createdAt, tags, user, favorite, _count, image }: Props) {
   const [isSaved, setIsSaved] = useState(!!favorite?.length);
   // Format the date as "MonthName Day, Year"
   const formattedDate = format(createdAt, 'MMMM dd, yyyy');
@@ -140,6 +138,4 @@ const Cart: NextPage<Props> = ({ title, id, createdAt, tags, user, favorite, _co
       </div>
     </div>
   );
-};
-
-export default Cart;
+}

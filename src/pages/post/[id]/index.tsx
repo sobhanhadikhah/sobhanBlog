@@ -6,7 +6,6 @@
 import { Warning } from '@phosphor-icons/react';
 import format from 'date-fns/format';
 import { MdPreview } from 'md-editor-rt';
-import { type NextPage } from 'next';
 import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
@@ -57,7 +56,7 @@ export default function PostInfo() {
     }
   }
   return (
-    <div style={{ scrollBehavior: 'smooth' }} className="mx-auto max-w-3xl bg-[#171717] ">
+    <div style={{ scrollBehavior: 'smooth' }} className="mx-auto max-w-4xl bg-[#171717] ">
       {data.post?.image ? (
         <div
           style={{ width: '100%', height: '100%' }}
@@ -72,11 +71,11 @@ export default function PostInfo() {
             sizes="100vw"
             quality={70}
             className="rounded-none md:rounded-t-lg "
-            style={{ objectFit: 'cover', width: '100%', height: '100%' }}
+            style={{ width: '100%', height: '100%' }}
           />
         </div>
       ) : null}
-      <main>
+      <main className="p-2 md:p-12">
         {/* userinfo */}
         <div className="!z-[50]   p-3  md:rounded-md  ">
           <div className="flex items-center gap-2  ">
@@ -91,7 +90,9 @@ export default function PostInfo() {
             ) : null}
 
             <div>
-              <Link href={'/'} className="font-semibold hover:text-blue-300 ">
+              <Link
+                href={`/user/info/${data.post?.user.id}`}
+                className="font-semibold hover:text-blue-300 ">
                 {data.post?.user.name}
               </Link>
               <p className="text-xs text-gray-400 ">
@@ -106,8 +107,8 @@ export default function PostInfo() {
         </div>
 
         {/* tags */}
-        <div className=" h-[100vh] pb-10 ">
-          <div className=" flex gap-3 bg-black px-3 pt-3 ">
+        <div className=" mt-5 h-[50vh]  ">
+          <div className=" flex gap-3  px-3 pt-3 ">
             {data.post?.tags.map((item) => (
               <Link href={`/t/${item.id}`} key={item.id}>
                 {' '}
@@ -118,7 +119,7 @@ export default function PostInfo() {
           </div>
           {/* content */}
           <MdPreview
-            style={{ backgroundColor: '#000' }}
+            style={{ backgroundColor: '#171717' }}
             showCodeRowNumber
             modelValue={data.post?.content ?? ''}
             theme="dark"

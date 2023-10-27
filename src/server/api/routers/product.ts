@@ -248,7 +248,7 @@ export const productRouter = createTRPCRouter({
         };
       } catch (error) {}
     }),
-  getFavorite: protectedProcedure
+  /* getFavorite: protectedProcedure
     .input(z.object({ limit: z.number() }))
     .query(async ({ ctx, input }) => {
       try {
@@ -277,6 +277,59 @@ export const productRouter = createTRPCRouter({
           success: true,
         };
       } catch (error) {}
+    }), */
+  getFavorite: publicProcedure
+    .input(
+      z.object({
+        limit: z.number(),
+        cursor: z.string().nullish(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      try {
+        const { cursor, limit } = input;
+
+        const posts = await ctx.db.favorite.findMany({
+          take: limit + 1,
+          cursor: cursor ? { id: cursor } : undefined,
+          where: {
+            userId: ctx.session?.user.id,
+          },
+          include: {
+            post: {
+              include: {
+                user: true,
+                _count: {
+                  select: {
+                    like: true,
+                    comment: true,
+                    favorite: true,
+                  },
+                },
+              },
+            },
+            user: true,
+          },
+        });
+
+        let nextCursor: typeof cursor | undefined = undefined;
+        if (posts.length > limit) {
+          const nextItem = posts.pop(); // return the last item from the array
+          nextCursor = nextItem?.id;
+        }
+        const count = await ctx.db.post.count();
+        const totalPages = Math.ceil(count / input.limit);
+
+        return {
+          posts,
+          nextCursor,
+          count,
+          totalPages,
+        };
+      } catch (error) {
+        // Handle errors appropriately
+        throw error;
+      }
     }),
 
   byId: publicProcedure.input(z.object({ id: z.string() })).query(async ({ input, ctx }) => {
