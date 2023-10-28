@@ -16,14 +16,15 @@ export default function UserInfo() {
     }
   return (
     <>
+    <ProfileLayout userName={data?.user?.name ?? ""} >
+
+    
             <div className='flex items-center flex-col gap-5  justify-center mt-10 ' >
                 <Image src={data?.user?.image ?? ""}
                  alt='profile'
                   width={68} height={68}
                    className='rounded-full z-50 ring-2 ring-purple-500 w-[128px] ' />
-                    <h1 className='text-xl font-bold ' >
-                        {data?.user?.name}
-                    </h1>
+                    
                     <div className='flex gap-3 justify-between items-center ' >
                         <span className='bg-white rounded-full font-bold text-purple-500 p-1 px-2 items-center' > Posts: {data?.user?._count.posts}</span>
                         <span className='bg-white rounded-full font-bold text-purple-500 p-1 px-2 items-center' > Reading List: {data?.user?._count.favorite}</span>
@@ -33,14 +34,12 @@ export default function UserInfo() {
             {/* i want render my cart here */}
             <div 
             style={{height:"calc(100vh - 323px)"}}
-            className='max-w-5xl p-3 w-full flex flex-col gap-3 rounded-lg mx-auto  overflow-auto ' >
+            className='max-w-5xl p-3 w-full  items-center gap-3 rounded-lg mx-auto  grid overflow-auto ' >
                   {
                     data?.user?.posts.map((item)=> <Cart key={item.id} {...item} />)
                   }
-            </div>            
+            </div>
+            </ProfileLayout>            
     </>
   )
 }
-UserInfo.getLayout = function getLayout(page: ReactNode) {
-  return <ProfileLayout>{page}</ProfileLayout>;
-};

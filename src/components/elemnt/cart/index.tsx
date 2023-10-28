@@ -1,13 +1,15 @@
 import format from 'date-fns/format';
 import { api } from '~/utils/api';
-import { BookmarkSimple, Heart, Chat } from '@phosphor-icons/react';
+import { BookmarkSimple, Heart, Chat, TrashSimple } from '@phosphor-icons/react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState } from 'react';
 import { type _count } from '~/types/post/index.';
 import { type User, type Favorite, type Like, type Tag } from '~/types/post/index.';
+import toast from 'react-hot-toast';
 
 interface Props {
+  isDeletable?: boolean;
   title: string;
   id: string;
   content: string;
@@ -19,14 +21,25 @@ interface Props {
   comment?: Comment[];
   favorite?: Favorite[] | undefined;
   _count?: _count;
-  image: string | null;
+  image?: string | null;
 }
 
-export default function Cart({ title, id, createdAt, tags, user, favorite, _count, image }: Props) {
+export default function Cart({
+  title,
+  id,
+  createdAt,
+  tags,
+  user,
+  favorite,
+  _count,
+  image,
+  isDeletable,
+  refetch,
+}: Props) {
   const [isSaved, setIsSaved] = useState(!!favorite?.length);
   // Format the date as "MonthName Day, Year"
   const formattedDate = format(createdAt, 'MMMM dd, yyyy');
-
+  const { mutate } = api.post.deleteProduct.useMutation();
   const { isLoading: isLoadingFavorite, mutate: mutateFavorite } = api.post.setFavorite.useMutation(
     {
       onError() {
@@ -87,6 +100,30 @@ export default function Cart({ title, id, createdAt, tags, user, favorite, _coun
               className="text-xl font-bold  capitalize text-white hover:text-sky-200 md:text-3xl ">
               {title}
             </Link>
+            {isDeletable ? (
+              <button
+                onClick={() => {
+                  toast.loading('Deleting', { id });
+                  mutate(
+                    { id },
+                    {
+                      onSuccess() {
+                        toast.success('Delete it', { id });
+                        if (refetch) {
+                          refetch();
+                        }
+                      },
+                      onError() {
+                        toast.error('Error', { id });
+                      },
+                    },
+                  );
+                }}
+                className="text-red-500 hover:text-red-900">
+                {' '}
+                <TrashSimple size={26} />{' '}
+              </button>
+            ) : null}
           </div>
           {/* Tags */}
           <div className="mt-3 flex flex-wrap gap-3  text-sm">

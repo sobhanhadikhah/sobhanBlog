@@ -23,7 +23,7 @@ const [value, setValue] = useState(router.query.query ?? "" );
   function Search() {
     if (query) {
     const data =  query.toString();
-      mutate({query:data})
+      mutate({query:data.toLowerCase()})
     }
   }
   useEffect(()=>{

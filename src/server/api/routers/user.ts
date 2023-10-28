@@ -15,8 +15,24 @@ export const UserInfoRoute = createTRPCRouter({
     try {
       return {
         user: await ctx.db.user.findFirst({where:{id:input.id},include:
-          {favorite:true,posts:true,comment:true,likes:true,sessions:true,_count:{
+          {favorite:true,posts:{
+            include:{
+              user:true,
+              like:true,
+              favorite:true,
+              tags:true,
+              comment:true,
+              _count:{
+                select:{
+                  like:true,
+                  comment:true,
+                   favorite:true
+                }
+              }
+            }
+          },comment:true,likes:true,sessions:true,_count:{
             select:{
+              likes:true,
               comment:true,
               posts:true,
               favorite:true
