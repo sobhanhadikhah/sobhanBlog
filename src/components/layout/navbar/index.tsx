@@ -6,8 +6,6 @@ import { useState, useRef, useEffect, useCallback, type FormEvent } from 'react'
 import { useOutsideClick } from '~/hook/useOutsideClick';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useRouter } from 'next/router';
-import { api } from '~/utils/api';
-import { useDebounce } from '~/hook/useDebounce';
 function Navbar() {
   const { data: sessionData, status } = useSession();
   const authorized = status === 'authenticated';
@@ -15,38 +13,24 @@ function Navbar() {
   //  const loading = status === 'loading';
   const Profile = sessionData?.user.image;
   const [toggle, setToggle] = useState(false);
-  const { push } = useRouter();
+  const router = useRouter();
   const sidebarRef = useRef(null);
-  const [query, setQuery] = useState('');
-
+  const [query, setQuery] = useState(router.query.query ?? '');
+  useEffect(() => {
+    return setQuery(router.query.query ?? '');
+  }, [router.query]);
   useOutsideClick(sidebarRef, () => {
     setToggle(false);
   });
-  const { data, mutate } = api.post.search.useMutation({
-    onSuccess(data) {
-      console.log(data);
-    },
-  });
 
   async function handleSignOut() {
-    await push('/');
+    await router.push('/');
     await signOut();
   }
-  // Handle search with debouncing
-
-  /* useDebounce(
-    () => {
-      if (query) {
-        mutate({ query });
-      }
-    },
-    300,
-    [query],
-  ); */
   async function handleSearchPush(e: FormEvent) {
     e.preventDefault();
     if (query) {
-      await push({ pathname: '/search', query: { query: query } });
+      await router.push({ pathname: '/search', query: { query: query } });
     } else {
       return;
     }
@@ -65,7 +49,7 @@ function Navbar() {
               <input
                 placeholder="Search..."
                 className=" rounded-md border-none bg-transparent px-2 py-2 text-white ring-1 ring-white focus:outline-none focus:outline-2   focus:ring-purple-500 "
-                type="search"
+                type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
               />
@@ -77,9 +61,14 @@ function Navbar() {
           <div>
             {authorized ? (
               <div className="flex items-center gap-3 ">
-                <Link href={'/search'} type="button" className="block md:hidden">
+                <button
+                  onClick={() =>
+                    void (router.pathname === '/search' ? null : router.push('/search'))
+                  }
+                  type="button"
+                  className="block md:hidden">
                   <MagnifyingGlass size={26} />
-                </Link>
+                </button>
                 <Link
                   className="hidden rounded-sm px-3 py-2 font-semibold ring-2 ring-white hover:bg-white hover:text-black md:flex "
                   href={'/post/create'}>

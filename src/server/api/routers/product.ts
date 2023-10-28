@@ -352,6 +352,18 @@ export const productRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       try {
         const result = await ctx.db.post.findMany({
+          take: 10,
+          include: {
+            user: true,
+            tags: true,
+            _count: {
+              select: {
+                like: true,
+                comment: true,
+                favorite: true,
+              },
+            },
+          },
           where: {
             OR: [
               {

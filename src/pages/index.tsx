@@ -12,8 +12,9 @@ import 'react-loading-skeleton/dist/skeleton.css';
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import Link from 'next/link';
 import MainLayout from '~/components/layouts/main';
-import MyModal from '~/components/modal';
 import { useSession } from 'next-auth/react';
+import Sort from '~/components/sort';
+import SkeletonLoading from '~/components/skeletonLoading';
 
 export default function Home() {
   const { status: sessionStatus } = useSession();
@@ -30,24 +31,23 @@ export default function Home() {
   const [page, setPage] = useState(0);
   const [totalPage, setTotalPage] = useState(0);
 
-  const { refetch, isLoading, fetchNextPage, isInitialLoading, data } =
-    api.post.getAll.useInfiniteQuery(
-      {
-        limit: 30,
-        order: sort || undefined,
+  const { refetch, isLoading, fetchNextPage, data } = api.post.getAll.useInfiniteQuery(
+    {
+      limit: 30,
+      order: sort || undefined,
+    },
+    {
+      queryKey: ['post.getAll', { limit: 30, order: sort || undefined }],
+      refetchOnWindowFocus: false,
+      getNextPageParam: (lastPage, pages) => {
+        if (Math.ceil(lastPage.count / 30) > pages.length) return lastPage.nextCursor;
+        return undefined;
       },
-      {
-        queryKey: ['post.getAll', { limit: 30, order: sort || undefined }],
-        refetchOnWindowFocus: false,
-        getNextPageParam: (lastPage, pages) => {
-          if (Math.ceil(lastPage.count / 30) > pages.length) return lastPage.nextCursor;
-          return undefined;
-        },
-        onSuccess(data) {
-          setTotalPage(data?.pages[page]?.totalPages ?? 0);
-        },
+      onSuccess(data) {
+        setTotalPage(data?.pages[page]?.totalPages ?? 0);
       },
-    );
+    },
+  );
   //@ts-ignore
   const posts: Post[] = data?.pages.reduce((acc, page) => {
     return [...acc, ...page.posts];
@@ -59,21 +59,15 @@ export default function Home() {
     await fetchNextPage();
   };
 
-  const sortButtons = [
-    {
-      id: 'latestId',
-      value: '',
-      label: 'Latest',
-    },
-    {
-      id: 'likeId',
-      value: 'like',
-      label: 'Top',
-    },
-  ];
-
   const { data: tagsData, isLoading: isLoadingTags } = api.tag.getAllTagResult.useQuery();
-
+  function handleSetSort(value: string) {
+    {
+      if (value !== sort) {
+        setSort(value);
+        setPage(0);
+      }
+    }
+  }
   return (
     <>
       <Head>
@@ -118,62 +112,13 @@ export default function Home() {
         </div>
         <div className="col-span-12 grid h-full grid-cols-12 items-start gap-y-2  overflow-auto md:col-span-7">
           {/* sort */}
-          <div className="col-span-12 flex    gap-5  px-3 py-3 text-2xl">
-            {sortButtons.map((item) => (
-              <button
-                key={item.id}
-                onClick={() => {
-                  if (item.value !== sort) {
-                    setSort(item.value);
-                    setPage(0);
-                    console.log('from sort', page);
-                  }
-                }}
-                className={`${item.value === sort ? 'font-bold text-white' : 'text-white/75'}`}>
-                {item.label}
-              </button>
-            ))}
-          </div>
+          <Sort setSort={handleSetSort} sort={sort} />
           {/* posts */}
           {!isLoading && posts
             ? posts?.map((item) => <Cart refetch={refetch} key={item.id} {...item} />)
             : Array(6)
                 .fill('id')
-                .map((item, index) => (
-                  <SkeletonTheme
-                    key={`skeleton${index}`}
-                    height={411}
-                    baseColor="#202020"
-                    highlightColor="#444;">
-                    <div className="z-50 col-span-12 h-full rounded-none bg-[#171717] px-3 md:rounded-md">
-                      <div className="flex flex-col ">
-                        {/* profile auth */}
-                        <div className="flex items-center gap-3 text-black dark:text-white ">
-                          <div className="flex items-center space-x-3">
-                            <div className="group flex items-center gap-1 ">
-                              <Skeleton width={32} height={32} style={{ borderRadius: '100%' }} />
-                              <div className="flex flex-col items-center gap-1 ">
-                                <Skeleton width={100} height={5} />
-                                <Skeleton width={100} height={5} />
-                              </div>
-                            </div>
-                          </div>
-                          <h4 className="py-3 font-sans text-sm font-bold "></h4>
-                          <span className="text-blue-400"> </span>
-                        </div>
-                        {/* main data */}
-                        <div className="dark flex w-full flex-col justify-center ">
-                          <h1 className="py-2 text-lg font-extrabold lg:text-xl ">
-                            <Skeleton height={8} />
-                          </h1>
-                          <p className="text-sm font-light leading-relaxed text-gray-400 lg:text-base ">
-                            <Skeleton count={3} height={4} />
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </SkeletonTheme>
-                ))}
+                .map((item, index) => <SkeletonLoading key={`skeleton${index}`} />)}
           {!isLoading && totalPage !== page ? (
             <div
               className="col-span-1 flex items-center justify-center p-4 py-3 sm:col-span-2 md:col-span-3"
