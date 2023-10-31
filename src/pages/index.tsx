@@ -15,6 +15,8 @@ import MainLayout from '~/components/layouts/main';
 import { useSession } from 'next-auth/react';
 import Sort from '~/components/sort';
 import SkeletonLoading from '~/components/skeletonLoading';
+import Image from 'next/image';
+import { Flex, ScrollArea, Text } from '@radix-ui/themes';
 
 export default function Home() {
   const { status: sessionStatus } = useSession();
@@ -113,6 +115,32 @@ export default function Home() {
         <div className="col-span-12 grid h-full grid-cols-12 items-start gap-y-2  overflow-auto md:col-span-7">
           {/* sort */}
           <Sort setSort={handleSetSort} sort={sort} />
+          <div className="relative col-span-12 flex gap-5  overflow-visible ">
+            <ScrollArea type="always" scrollbars="horizontal">
+              <div className="flex gap-1 md:hidden  ">
+                {isLoadingTags
+                  ? Array(6)
+                      .fill('id')
+                      .map((item, index) => (
+                        <SkeletonTheme
+                          key={`skeleton${index}`}
+                          height={411}
+                          baseColor="#202020"
+                          highlightColor="#444">
+                          <Skeleton height={10} width={200} />
+                        </SkeletonTheme>
+                      ))
+                  : tagsData?.map((item) => (
+                      <Link
+                        href={`/t/${item.id}`}
+                        key={item.id}
+                        className="flex gap-3   rounded-full bg-[#171717] p-1 px-4 text-gray-100  transition-all duration-150 hover:bg-[#1f1f1f]">
+                        <span>#{item.label}</span>
+                      </Link>
+                    ))}
+              </div>
+            </ScrollArea>
+          </div>
           {/* posts */}
           {!isLoading && posts
             ? posts?.map((item) => <Cart refetch={refetch} key={item.id} {...item} />)
@@ -127,7 +155,20 @@ export default function Home() {
           ) : null}
         </div>
         {/* banner */}
-        <div className="col-span-2 hidden md:flex">banner is here</div>
+        {/* <div className="col-span-2 hidden w-full px-1 md:flex">
+          <a
+            target="_blank"
+            href={'https://mahak-charity.org/online-payment/'}
+            style={{ width: '100%' }}
+            className="relative col-span-12 mt-10 aspect-video max-h-[400px] w-full ">
+            <Image
+              className="rounded-lg shadow-md shadow-slate-300 "
+              fill
+              alt="kany"
+              src={'https://sobhanblog.storage.iran.liara.space/banner/banner.jpg'}
+            />
+          </a>
+        </div> */}
       </div>
     </>
   );

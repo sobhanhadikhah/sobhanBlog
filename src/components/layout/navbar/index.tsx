@@ -107,6 +107,9 @@ function Navbar() {
                         <Link onClick={() => setToggle(false)} href={'/saved'}>
                           Reading list
                         </Link>
+                        <Link onClick={() => setToggle(false)} href={'/about'}>
+                          About
+                        </Link>
                         <div className="border-b" />
                         <button
                           type="button"
