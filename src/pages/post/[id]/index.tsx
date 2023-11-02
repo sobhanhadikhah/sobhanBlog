@@ -56,7 +56,7 @@ export default function PostInfo() {
     }
   }
   return (
-    <div style={{ scrollBehavior: 'smooth' }} className="mx-auto max-w-4xl bg-[#171717] ">
+    <div style={{ scrollBehavior: 'smooth' }} className="mx-auto  max-w-4xl bg-[#171717] ">
       {data.post?.image ? (
         <div
           style={{ width: '100%', height: '100%' }}
@@ -107,7 +107,7 @@ export default function PostInfo() {
         </div>
 
         {/* tags */}
-        <div className=" mt-5 h-[50vh]  ">
+        <div className=" mt-5   ">
           <div className=" flex gap-3  px-3 pt-3 ">
             {data.post?.tags.map((item) => (
               <Link href={`/t/${item.id}`} key={item.id}>
@@ -129,7 +129,7 @@ export default function PostInfo() {
         {/* comment */}
         <div className=" border-b border-gray-500 " />
         {!unAuthorized ? (
-          <div className="mx-3 pb-40 pt-10 ">
+          <div className="mx-3  pt-10 ">
             <div className="flex flex-col gap-5  ">
               <div id="commentSection" className="flex items-center gap-3 ">
                 <h2 className="text-3xl">Top comments ({data.post?.comment.length})</h2>
@@ -145,7 +145,7 @@ export default function PostInfo() {
                 <button
                   disabled={isLoadingComment || !value}
                   onClick={() => void handleComment(id, value, userData?.user.id)}
-                  className="rounded-md  bg-sky-400 px-3 py-2 ">
+                  className="mb-10  rounded-md bg-sky-400 px-3 py-2 ">
                   Submit
                 </button>
               </div>
